@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 모바일에서도 데스크톱 폭(1200px)으로 고정 -->
+    <meta name="viewport" content="width=1200">
     <title>K-Health Ticket - 블록체인 기반 디지털 진단서</title>
     <style>
         * {
@@ -11,11 +12,15 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            min-width: 1200px; /* 데스크톱 레이아웃 유지 */
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: #2c3e50;
-            overflow-x: hidden;
+            overflow-x: auto; /* 모바일에서 내용 잘리지 않도록 */
         }
 
         /* Header */
@@ -47,7 +52,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-          /* 애니메이션 초기 상태 */
+            /* 애니메이션 초기 상태 */
             opacity: 0;
             transform: scale(0.8);
             animation: logoIntro 0.8s ease-out forwards;
@@ -55,35 +60,25 @@
 
         /* 애니메이션 키프레임 */
         @keyframes logoIntro {
-            0% {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
         }
         
         /* 이미지 로고 전용 스타일 */
         .logo_respon {
-        max-width: 35px;
-        height: auto;
-        display: block;
-        filter: drop-shadow(0 4px 6px rgba(66, 188, 147, 0.3));
-
-        /* 애니메이션 초기 상태 */
-        animation: pulseLogo 2s ease-in-out infinite;
+            max-width: 35px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 4px 6px rgba(66, 188, 147, 0.3));
+            animation: pulseLogo 2s ease-in-out infinite;
         }
 
-        /* 로고 구간 전체 애니메이션 설정 */
         @keyframes pulseLogo {
-        0%   { transform: scale(1); }
-        50%  { transform: scale(1.10); }
-        100% { transform: scale(1); }
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.10); }
+            100% { transform: scale(1); }
         }
         
-
         nav ul {
             display: flex;
             list-style: none;
@@ -103,7 +98,6 @@
             color: #4A90E2;
             background: rgba(74, 144, 226, 0.1);
         }
-
 
         /* Hero Section */
         .hero {
@@ -130,24 +124,17 @@
             line-height: 1.2;
             margin-bottom: 1.5rem;
             color: #2c3e50;
-
-              opacity: 0;                  /* 처음에 안 보이게 */
-              transform: translateY(30px); /* 살짝 아래에서 시작 */
-              animation: fadeUp 2s ease-out forwards;
-              animation-delay: 0.3s;       /* 페이지 열리고 0.3초 뒤 실행 */
-            }
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 2s ease-out forwards;
+            animation-delay: 0.3s;
+        }
 
         @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-
-        .hero-content h1 .highlight {
-            color: #4A90E2;
-        }
+        .hero-content h1 .highlight { color: #4A90E2; }
 
         .hero-content p {
             font-size: 1.25rem;
@@ -195,10 +182,7 @@
             transition: all 0.3s ease;
         }
 
-        .btn-secondary:hover {
-            background: #4A90E2;
-            color: white;
-        }
+        .btn-secondary:hover { background: #4A90E2; color: white; }
 
         .hero-image {
             display: flex;
@@ -229,53 +213,36 @@
             color: white;
             text-align: center;
             position: relative;
-
-            background-size: 200% 200%; /* 부드러운 이동 위해 필요 */
-            animation: gradientFlow 3s ease-in-out infinite; /* 3초로 변경 */
+            background-size: 200% 200%;
+            animation: gradientFlow 3s ease-in-out infinite;
         }
 
-        /* 그라데이션 흐르는 애니메이션 */
         @keyframes gradientFlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .phone-screen img {
-            display: block;      
-            margin: 0 auto;      
-            width: 80px;         
-            height: auto; 
-            margin-bottom: 1rem;        
 
-            animation: fadeBlink 3s ease-in-out infinite; 
+        .phone-screen img {
+            display: block;
+            margin: 0 auto 1rem;
+            width: 80px;
+            height: auto;
+            animation: fadeBlink 3s ease-in-out infinite;
         }
 
         @keyframes fadeBlink {
-            0%, 100% {
-                opacity: 1; /* 완전히 보임 */
-            }
-            50% {
-                opacity: 0; /* 사라짐 */
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
-        .phone-content {
-            padding: 2rem;
-        }
+        .phone-content { padding: 2rem; }
 
-        .phone-content h3 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
+        .phone-content h3 { font-size: 1.2rem; margin-bottom: 1rem; }
 
-        .phone-content p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
+        .phone-content p { font-size: 0.9rem; opacity: 0.9; }
 
-
-
-        /*why-KHT Section*/
+        /* why-KHT Section */
         .why-KHT {
             padding: 100px 0;
             background: linear-gradient(135deg, #4A90E2, #67B26F);
@@ -288,20 +255,13 @@
             margin-top: 3rem;
             margin-bottom: 1rem;
             color: #ffffff;
-            
-            /* 초기 상태 */
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
-        /* 보일 때 활성화 상태 */
-        .why-KHT .section-title.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .why-KHT .section-title.show { opacity: 1; transform: translateY(0); }
         
-
         .why-KHT .section-subtitle{
             text-align: center;
             font-size: 1.2rem;
@@ -314,114 +274,70 @@
         }
 
         .why-KHT .highlight {
-            font-weight: 700;         /* 굵게 */
+            font-weight: 700;
             background: linear-gradient(90deg, #90fbc2, #5ce6fb);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; /* 그라데이션 텍스트 */
+            -webkit-text-fill-color: transparent;
         }
 
+        /* screen-showing Section */
+        .screen-showing { padding: 100px 0; background: #f8fbff; }
 
-        /*screen-showing Section*/
-        .screen-showing {
-            padding: 100px 0;
-            background: #f8fbff;
-        }
-        .screen-showing .container_left{
-            max-width: 1000px;        /* 좌우 두 개 들어갈 크기 */
+        .screen-showing .container_left,
+        .screen-showing .container_right {
+            max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
             display: flex;
-            justify-content: space-between; /* 좌우로 배치 */
+            justify-content: space-between;
             align-items: center;
             gap: 2rem;
-            min-height: 100vh;       
+            min-height: 100vh;
         }
-        .screen-showing .container_right{
-            max-width: 1000px;        /* 좌우 두 개 들어갈 크기 */
-            margin: 0 auto;
-            padding: 2rem;
+
+        .screen-mockup img { width: 60%; max-width: 150px; height: auto; border-radius: 20px; }
+
+        .text-box {
             display: flex;
-            justify-content: space-between; /* 좌우로 배치 */
-            align-items: center;
-            gap: 2rem;
-            min-height: 100vh;       
-        }
-        .screen-mockup img {/*목업 컨테이너*/
-            width: 60%;         /* 기존 80% → 50% */
-            max-width: 150px;   /* 화면이 커도 이 이상 안 커짐 */
-            height: auto;
-            border-radius: 20px;
-        }
-    
-        .text-box { /*글씨 컨테이너*/
-            display: flex;
-            flex-direction: column; /* 세로 배치 */
+            flex-direction: column;
             gap: 1rem;
             flex: 1;
+            opacity: 0;
+            transition: opacity 1s, transform 1s;
         }
+
         .text-box .title{
             font-weight: 700;
             text-align: center;
             font-size: 2rem;
             color: #3380ff;
             margin-bottom: 0.5rem;
+        }
 
-        }
-        .text-box p {
-            line-height: 1.6;
-            text-align: center;
-            color: #10395d;
-        }
+        .text-box p { line-height: 1.6; text-align: center; color: #10395d; }
         
-        /*목업 효과와 텍스트 효과*/
-        .container_left, .container_right {
-            opacity: 0;
-            transition: 1s;
-        }
+        /* 목업/텍스트 등장 효과 */
+        .container_left, .container_right { opacity: 0; transition: 1s; }
         .container_left { transform: translateX(-30px); }
         .container_right { transform: translateX(30px); }
-        .container_left.show, .container_right.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        /* 공통 초기 상태 */
-        .text-box {
-        opacity: 0;
-        transition: opacity 1s, transform 1s;
-        }
+        .container_left.show, .container_right.show { opacity: 1; transform: translateX(0); }
 
-        /* container_left 안의 텍스트는 오른쪽에서 */
-        .container_left .text-box {
-        transform: translateX(30px);
-        }
+        .container_left .text-box { transform: translateX(30px); }
+        .container_right .text-box { transform: translateX(-30px); }
+        .text-box.show { opacity: 1; transform: translateX(0); }
 
-        /* container_right 안의 텍스트는 왼쪽에서 */
-        .container_right .text-box {
-        transform: translateX(-30px);
-        }
-
-        /* show 클래스 붙으면 제자리 */
-        .text-box.show {
-        opacity: 1;
-        transform: translateX(0);
-        }
-
-        /*Simulation Section*/
+        /* Simulation Section */
         .Simulation{
             padding: 100px 0;
             background: #eef6ff;
             text-align: center;
         }
+
         @keyframes smoothPulse {
-            0%, 100% {
-                opacity: 1;          /* 완전 보임 */
-                transform: scale(1.05); /* 크기 변화 */
-            }
-            50% {
-                opacity: 0;      /*안 보임*/  
-                transform: scale(1); /* 크기 변화 없음 */
-            }
+            0%, 100% { opacity: 1; transform: scale(1.05); }
+            50% { opacity: 0; transform: scale(1); }
         }
+
         .Simulation .title {
             text-align: center;
             font-size: 2.5rem;
@@ -429,8 +345,7 @@
             margin-top: 3rem;
             margin-bottom: 1rem;
             color: #4A90E2;
-            animation: smoothPulse 1.8s ease-in-out infinite; /* 부드러운 깜빡임 */
-            
+            animation: smoothPulse 1.8s ease-in-out infinite;
         }
 
         .Simulation .subtitle{
@@ -460,14 +375,13 @@
             background: #ffffffa2;
             color:  #4A90E2;
             font-size: 1.2rem;
-    
             text-decoration: none;
             border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
             min-width: 200px;
             justify-content: center;
-            border: 2px solid  #4A90E2; /* 흰색 테두리 */
+            border: 2px solid  #4A90E2;
         }
 
         .simulation-button:hover{
@@ -483,21 +397,11 @@
             align-items: flex-start;
             gap: 0.2rem;
         }
-        
-
-
 
         /* Features Section */
-        .features {
-            padding: 100px 0;
-            background: white;
-        }
+        .features { padding: 100px 0; background: white; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
         .section-title {
             text-align: center;
@@ -549,23 +453,12 @@
             margin-bottom: 1.5rem;
         }
 
-        .feature-card h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
+        .feature-card h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #2c3e50; }
 
-        .feature-card p {
-            color: #5a6c7d;
-            line-height: 1.6;
-        }
+        .feature-card p { color: #5a6c7d; line-height: 1.6; }
 
         /* How It Works */
-        .how-it-works {
-            padding: 100px 0;
-            background: #f8fbff;
-        }
+        .how-it-works { padding: 100px 0; background: #f8fbff; }
 
         .steps-container {
             display: grid;
@@ -574,10 +467,7 @@
             margin-top: 4rem;
         }
 
-        .step {
-            text-align: center;
-            position: relative;
-        }
+        .step { text-align: center; position: relative; }
 
         .step-number {
             width: 60px;
@@ -593,21 +483,11 @@
             margin: 0 auto 1.5rem;
         }
 
-        .step h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
+        .step h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #2c3e50; }
 
-        .step p {
-            color: #5a6c7d;
-            line-height: 1.6;
-        }
+        .step p { color: #5a6c7d; line-height: 1.6; }
 
-
-
-        /*포인트 이미지 Section background: #4A90E2;*/
+        /* 포인트 이미지 Section */
         .pointIMG{
             padding: 0 0;
             background: linear-gradient(135deg, #0041b1, #bae6ff);
@@ -616,10 +496,10 @@
         }
 
         .pointIMG img{
-            width: 100%;        /* 기본 크기: 부모 폭의 60% */
-            height: auto;      /* 비율 유지 */
+            width: 100%;
+            height: auto;
             display: block;
-            margin: 0 auto;   
+            margin: 0 auto;
         }
 
         .pointIMG .title{
@@ -645,50 +525,26 @@
             transition: opacity .5s ease, transform .7s ease;
         }
 
-        /* 보일 때 순차 등장 */
         .pointIMG.seen .title {
             opacity: 1;
             transform: translateY(0);
-            transition-delay: .5s;      /* 먼저 */
+            transition-delay: .5s;
         }
         .pointIMG.seen .subtitle {
             opacity: 1;
             transform: translateY(0);
-            transition-delay: .8s;     /* 그 다음 */
+            transition-delay: .8s;
         }
-    
-
-
-
-
-
 
         /* App Download Section */
-        .app-download {
-            padding: 100px 0;
-            background: white;
-            text-align: center;
-        }
+        .app-download { padding: 100px 0; background: white; text-align: center; }
 
-        .download-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
+        .download-content { max-width: 800px; margin: 0 auto; padding: 0 2rem; }
 
-        .download-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
+        .download-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: #2c3e50; }
 
-        .download-subtitle {
-            font-size: 1.2rem;
-            color: #5a6c7d;
-            margin-bottom: 1rem;
-        }
-        /*클립 로고 css*/
+        .download-subtitle { font-size: 1.2rem; color: #5a6c7d; margin-bottom: 1rem; }
+
         .klip-logo {
             width: clamp(30px, 25vw, 60px);
             height: auto;
@@ -699,21 +555,15 @@
             transition: transform .25s ease, filter .25s ease;
         }
 
-        .store-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
+        .store-buttons { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
 
         .store-button {
             display: inline-flex;
             align-items: center;
             gap: 1rem;
             padding: 1rem 2rem;
-            background-color: rgba(10, 113, 217, 0.622); /* 0.7은 불투명도 */
+            background-color: rgba(10, 113, 217, 0.622);
             color: #f2f7ff;
-    
             text-decoration: none;
             border-radius: 12px;
             font-weight: 600;
@@ -728,30 +578,14 @@
             box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
         }
 
-        .store-button img {
-            width: 25px; /* 로고 크기 */
-            height: auto;
-            display: block;
-        }
+        .store-button img { width: 25px; height: auto; display: block; }
 
-        .store-text {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.2rem;
-        }
+        .store-text { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; }
 
-        .store-text small {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
+        .store-text small { font-size: 0.8rem; opacity: 0.8; }
 
-        .store-text span {
-            font-size: 1rem;
-            font-weight: 600;
-        }
+        .store-text span { font-size: 1rem; font-weight: 600; }
 
-        
         /* Footer */
         footer {
             background: #eef6ff;
@@ -766,27 +600,13 @@
             margin-bottom: 3rem;
         }
 
-        .footer-brand {
-            max-width: 300px;
-        }
+        .footer-brand { max-width: 300px; }
 
-        .footer-brand .logo {
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
+        .footer-brand .logo { margin-bottom: 1rem; font-size: 1.3rem; }
 
-        .footer-brand p {
-            color: #5a6c7d;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
+        .footer-brand p { color: #5a6c7d; line-height: 1.6; margin-bottom: 1.5rem; }
 
-        .footer-section h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #4A90E2;
-        }
+        .footer-section h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #4A90E2; }
 
         .footer-section a {
             color: #5a6c7d;
@@ -796,9 +616,7 @@
             transition: color 0.3s ease;
         }
 
-        .footer-section a:hover {
-            color: #4A90E2;
-        }
+        .footer-section a:hover { color: #4A90E2; }
 
         .footer-bottom {
             border-top: 1px solid rgba(0, 0, 0, 0.05);
@@ -810,90 +628,17 @@
             gap: 1rem;
         }
 
-        .footer-bottom p {
-            color: #4A90E2;
-            font-size: 0.9rem;
-        }
+        .footer-bottom p { color: #4A90E2; font-size: 0.9rem; }
 
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-        }
+        .footer-links { display: flex; gap: 2rem; }
 
-        .footer-links a {
-            color: #4A90E2;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
+        .footer-links a { color: #4A90E2; text-decoration: none; font-size: 0.9rem; transition: color 0.3s ease; }
 
-        .footer-links a:hover {
-            color: #4A90E2;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .header-container {
-                flex-direction: column;
-                gap: 1rem;
-                padding: 0 1rem;
-            }
-
-            nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 1rem;
-            }
-
-            .hero-container {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 2rem;
-            }
-
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .phone-mockup {
-                width: 250px;
-                height: 500px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .steps-container {
-                grid-template-columns: 1fr;
-            }
-
-            .store-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
+        .footer-links a:hover { color: #4A90E2; }
 
         /* Smooth animations */
         .fade-in { opacity: 0; transform: translateY(16px); transition: .8s; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
-
-
 
         /* Loading animation for phone mockup */
         .phone-screen::before {
@@ -975,11 +720,8 @@
              <span class="highlight">K-Health ticket</span>은 환자가 처방전과 의료데이터를 직접 보관하고<br>
              활용할 수 있도록 돕는 <span class="highlight">새로운 헬스케어</span> 연결 방식입니다.
             </div>
-        
         </div>
-
     </section>
-
 
     <!--screen showing Section-->
     <section class="screen-showing" id="screen-showing">
@@ -995,7 +737,7 @@
                 </p>
             </div>
         </div>
-         <div class="container_right">
+        <div class="container_right">
             <div class="text-box">
                 <h3 class="title">NFT 진단서</h3>
                 <p>
@@ -1005,34 +747,24 @@
                     신뢰성과 편의성을 동시에 제공합니다.
                 </p>
             </div>
-
             <img class="screen-mockup" src="./images/Screen1.png" alt="로고 이미지"> 
         </div>
     </section>
 
-
     <!-- Simulation Section -->
     <section class="Simulation" id="Simulation">
         <div class="title">K-Health Ticket 유저 시뮬레이션을 체험해보세요!</div>
-        <div class="subtitle">
-            약국과 공항에서 사용되는 서비스를 직접 체험해 볼 수 있습니다.
-        </div>
+        <div class="subtitle">약국과 공항에서 사용되는 서비스를 직접 체험해 볼 수 있습니다.</div>
 
         <div class="simulation-buttons">
             <a href="./website/pharmacyservice.html" class="simulation-button">
-                <div class="simulationBtn-text">
-                    <span>약국 바로가기</span>
-                </div>
+                <div class="simulationBtn-text"><span>약국 바로가기</span></div>
             </a>
             <a href="./website/airportservice.html" class="simulation-button">
-                <div class="simulationBtn-text">
-                    <span>공항 바로가기</span>
-                </div>
+                <div class="simulationBtn-text"><span>공항 바로가기</span></div>
             </a>
-            </div>
+        </div>
     </section>
-
-
 
     <!-- Features Section -->
     <section class="features" id="features">
@@ -1119,7 +851,7 @@
         <div class="download-content">
             <h2 class="download-title">지금 Klip앱에서 바로 시작하세요</h2>
             <p class="download-subtitle">K-Health Ticket으로 더 스마트하고 안전한 의료 서비스를 경험해보세요</p>
-            <img src="./images/KlipLogo.png" class="klip-logo">
+            <img src="./images/KlipLogo.png" class="klip-logo" alt="Klip 로고">
             <div class="store-buttons">
                 <a href="#" class="store-button">
                     <img src="./images/applestore.png" alt="Apple Logo">
@@ -1144,9 +876,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <div class="logo">
-                        K-Health Ticket
-                    </div>
+                    <div class="logo">K-Health Ticket</div>
                     <p>블록체인 기반 디지털 의료 서비스의 선도 기업으로서, 안전하고 혁신적인 의료 솔루션을 제공합니다.</p>
                 </div>
                 <div class="footer-section">
@@ -1195,33 +925,24 @@
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
         // Fade in animation on scroll
-        const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-        };
-
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
         const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            entry.target.classList.toggle('visible', entry.isIntersecting);
-        });
+            entries.forEach((entry) => {
+                entry.target.classList.toggle('visible', entry.isIntersecting);
+            });
         }, observerOptions);
+        document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 
-    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
         // Header scroll effect
-        let lastScrollTop = 0;
         window.addEventListener('scroll', function() {
             const header = document.querySelector('header');
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
             if (scrollTop > 100) {
                 header.style.background = 'rgba(255, 255, 255, 0.98)';
                 header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
@@ -1229,64 +950,38 @@
                 header.style.background = 'rgba(255, 255, 255, 0.95)';
                 header.style.boxShadow = 'none';
             }
-            
-            lastScrollTop = scrollTop;
         });
-
 
         // why-KHT 대제목 효과
         document.addEventListener("DOMContentLoaded", () => {
-        const el = document.querySelector(".why-KHT .section-title");
-        if (!el) return;
-
-        const io = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                // 화면에 (절반 이상) 들어오면 등장 효과 실행
-                entry.target.classList.add("show");
-                }else {
-                // 화면에서 벗어나면 초기화 → 다음에 다시 들어올 때 또 재생
-                entry.target.classList.remove("show");
-                }
-            });
-        }, { threshold: 0.5 });
-
-        io.observe(el);
+            const el = document.querySelector(".why-KHT .section-title");
+            if (!el) return;
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add("show");
+                    else entry.target.classList.remove("show");
+                });
+            }, { threshold: 0.5 });
+            io.observe(el);
         });
 
-
-        //목업과 텍스트 효과
+        // 목업과 텍스트 효과
         const ioLR = new IntersectionObserver((entries)=>{
-        entries.forEach(v=>{
-            v.target.classList.toggle('show', v.isIntersecting);
-        });
+            entries.forEach(v=>{ v.target.classList.toggle('show', v.isIntersecting); });
         },{ threshold: 0.25 });
-
-        document.querySelectorAll('.container_left, .container_right')
-        .forEach(el => ioLR.observe(el));
+        document.querySelectorAll('.container_left, .container_right').forEach(el => ioLR.observe(el));
 
         const ioText = new IntersectionObserver(entries=>{
-        entries.forEach(v=>{
-            v.target.classList.toggle('show', v.isIntersecting);
-        });
+            entries.forEach(v=>{ v.target.classList.toggle('show', v.isIntersecting); });
         },{threshold:0.2});
-
         document.querySelectorAll('.text-box').forEach(el=>ioText.observe(el));
 
-
-
-        //포인트 이미지 섹션 텍스트 효과
+        // 포인트 이미지 섹션 텍스트 효과
         const sec = document.querySelector('.pointIMG');
         const ioPoint = new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-            sec.classList.toggle('seen', e.isIntersecting);
-        });
+            entries.forEach(e=>{ sec.classList.toggle('seen', e.isIntersecting); });
         },{ threshold: 0.2 });
-
         ioPoint.observe(sec);
-
-
-        
     </script>
 </body>
 </html>
