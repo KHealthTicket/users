@@ -217,6 +217,7 @@
     </script>
   
     <meta charset="UTF-8">
+    <!-- 모바일에서도 데스크톱 폭으로 고정 -->
     <meta name="viewport" content="width=1200">
     <title>약국용 처방전 검증 시스템</title>
     <style>
@@ -228,6 +229,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        html, body { min-width: var(--app-width); }
         body {
             font-family: 'Arial', sans-serif;
             min-height: 100vh;
@@ -236,7 +238,7 @@
             justify-content: center;
             color: #333;
             background: #ffffff;
-            overflow-x: auto; /* 모바일에서 가로스크롤 허용 */
+            overflow-x: auto; /* 필요 시 가로 스크롤 허용 */
         }
         
         .container {
@@ -254,13 +256,7 @@
             padding: 30px;
             text-align: center;
         }
-        
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-        
+        .header h1 { font-size: 32px; margin-bottom: 10px; font-weight: 300; }
         .header p { opacity: 0.9; font-size: 16px; }
         
         .main-content {
@@ -286,17 +282,21 @@
             transition: all 0.3s ease;
             margin-bottom: 30px;
         }
-        .prescription-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(39, 174, 96, 0.4);
-        }
+        .prescription-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(39, 174, 96, 0.4); }
+        .prescription-btn:active { transform: translateY(-1px); }
         
         .info-text { color: #7f8c8d; font-size: 18px; line-height: 1.6; }
         
+        /* ============ 선택(Selection) 화면: 데스크톱 레이아웃 강제 ============ */
         .selection-screen { display: none; text-align: center; width: 100%; }
-        .selection-title { font-size: 28px; margin-bottom: 40px; font-weight: 300; }
-        .selection-buttons { display: flex; gap: 40px; justify-content: center; margin-bottom: 40px; }
-        
+        .selection-title { font-size: 28px; color: #2c3e50; margin-bottom: 40px; font-weight: 300; }
+        .selection-buttons {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: nowrap !important;      /* 줄바꿈 금지 */
+        }
         .method-btn {
             background: white;
             border: 3px solid #3498db;
@@ -304,56 +304,87 @@
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 200px;
+            width: 240px;                      /* 고정 폭 */
             text-align: center;
         }
         .method-btn:hover {
             background: #3498db; color: white; transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3);
         }
-        
+        .method-icon { font-size: 60px; margin-bottom: 20px; }
+        .method-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+        .method-desc { font-size: 14px; opacity: 0.8; }
+        .selection-screen .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-direction: row !important;    /* 버튼 가로 유지 */
+        }
+        .selection-screen .btn { width: auto !important; max-width: none !important; }
+
+        /* ============ NFC 화면: 데스크톱 레이아웃 강제 ============ */
         .nfc-screen { display: none; text-align: center; width: 100%; }
         .nfc-animation {
             width: 150px; height: 150px; margin: 0 auto 30px;
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 60px; color: white; animation: pulse 2s infinite;
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.5);
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .nfc-status { font-size: 24px; margin-bottom: 20px; font-weight: 300; }
+        @keyframes pulse { 0% { transform: scale(1);} 50% { transform: scale(1.1);} 100% { transform: scale(1);} }
+        .nfc-status { font-size: 24px; color: #2c3e50; margin-bottom: 20px; font-weight: 300; }
         .nfc-instruction { font-size: 16px; color: #7f8c8d; margin-bottom: 30px; line-height: 1.6; }
-        
+        .nfc-screen .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-direction: row !important;    /* 버튼 가로 유지 */
+        }
+        .nfc-screen .btn { width: auto !important; max-width: none !important; }
+
+        /* ============ 처방전 목록 화면 (이 화면만 반응형 유지) ============ */
         .prescription-list-screen { display: none; width: 100%; }
         .success-header { text-align: center; margin-bottom: 40px; }
         .success-icon {
             width: 80px; height: 80px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 40px; color: white; margin: 0 auto 20px;
+            font-size: 40px; color: white; margin: 0 auto 20px; animation: checkmark 0.6s ease-in-out;
         }
-        
+        @keyframes checkmark { 0% { transform: scale(0);} 50% { transform: scale(1.2);} 100% { transform: scale(1);} }
+
         .patient-info { background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 30px; border-left: 5px solid #3498db; }
         .patient-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .patient-field { display: flex; justify-content: space-between; }
-        .patient-label { font-weight: bold; }
+        .patient-label { font-weight: bold; color: #2c3e50; }
         .patient-value { color: #7f8c8d; }
         
         .prescription-items { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .prescription-header { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); color: white; padding: 20px; font-size: 20px; font-weight: bold; }
-        .prescription-item { padding: 20px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; }
-        .medication-name { font-size: 18px; font-weight: bold; }
+        .prescription-header { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); color: white; padding: 20px 25px; font-size: 20px; font-weight: bold; }
+        .prescription-item { padding: 20px 25px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease; }
+        .prescription-item:hover { background-color: #f8f9fa; }
+        .prescription-item:last-child { border-bottom: none; }
+        .medication-info { flex: 1; }
+        .medication-name { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
         .medication-details { font-size: 14px; color: #7f8c8d; }
-        .medication-quantity { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
-        
+        .medication-quantity { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; min-width: 80px; text-align: center; }
         .action-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
         .btn { padding: 15px 30px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
         .btn-back { background: #95a5a6; color: white; }
+        .btn-back:hover { background: #7f8c8d; transform: translateY(-2px); }
         .btn-process { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; }
+        .btn-process:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3); }
         .btn-new { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; }
+        .btn-new:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3); }
+
+        /* ====== 모바일일 때도 selection/nfc는 데스크톱 레이아웃 유지, 목록만 반응형 ====== */
+        @media (max-width: 768px) {
+            /* selection/nfc는 고정 레이아웃 유지: 아무 것도 바꾸지 않음 */
+            /* 처방전 목록 화면만 축소 레이아웃 */
+            .prescription-list-screen .patient-details { grid-template-columns: 1fr; }
+            .prescription-list-screen .prescription-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .prescription-list-screen .action-buttons { flex-direction: column; align-items: center; }
+            .prescription-list-screen .btn { width: 100%; max-width: 300px; }
+        }
 
         .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-left: 10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -377,7 +408,7 @@
                 </div>
             </div>
             
-            <!-- QR/NFC 선택 화면 -->
+            <!-- QR/NFC 선택 화면 (고정 레이아웃) -->
             <div class="selection-screen" id="selectionScreen">
                 <h2 class="selection-title">인증 방법을 선택해주세요</h2>
                 <div class="selection-buttons">
@@ -397,7 +428,7 @@
                 </div>
             </div>
             
-            <!-- NFC 인증 화면 -->
+            <!-- NFC 인증 화면 (고정 레이아웃) -->
             <div class="nfc-screen" id="nfcScreen">
                 <div class="nfc-animation">📡</div>
                 <div class="nfc-status" id="nfcStatus">NFC 인증 대기 중...</div>
@@ -408,7 +439,7 @@
                 </div>
             </div>
             
-            <!-- 처방전 목록 화면 -->
+            <!-- 처방전 목록 화면 (이 화면만 반응형) -->
             <div class="prescription-list-screen" id="prescriptionListScreen">
                 <div class="success-header">
                     <div class="success-icon">✓</div>
@@ -500,7 +531,7 @@
             setTimeout(() => {
                 loadPrescriptionData(samplePrescriptions[0]);
                 showScreen('prescriptionListScreen');
-                simulateBtn.textContent = 'NFC 인증';
+                simulateBtn.textContent = '인증';
                 simulateBtn.disabled = false;
             }, 3000);
         }
