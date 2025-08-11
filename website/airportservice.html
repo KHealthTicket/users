@@ -682,69 +682,96 @@
                 observer.observe(flow);
             });
 
-            // --- Draggable NFC <img> ---
-            (function () {
+             // --- Draggable NFC <img> : 마우스 + 터치 지원 ---
+              (function () {
                 const wrap = document.querySelector('.nfc');     // 컨테이너
                 const img  = wrap?.querySelector('img');         // 드래그할 이미지
                 if (!wrap || !img) return;
-
+            
                 // 컨테이너/이미지 위치 기준 설정
                 if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
                 img.style.position = 'absolute';
                 img.style.userSelect = 'none';
+                img.style.touchAction = 'none';   // 터치 스크롤 방지 (Pointer/Touch 공통)
                 img.style.cursor = 'grab';
-
+            
                 // 처음 한번 가운데 정렬
                 function centerOnce() {
-                    const w = wrap.clientWidth, h = wrap.clientHeight;
-                    const iw = img.clientWidth, ih = img.clientHeight;
-                    if (!img.style.left) img.style.left = ((w - iw) / 2) + 'px';
-                    if (!img.style.top)  img.style.top  = ((h - ih) / 2) + 'px';
+                  const w = wrap.clientWidth, h = wrap.clientHeight;
+                  const iw = img.clientWidth, ih = img.clientHeight;
+                  if (!img.style.left) img.style.left = ((w - iw) / 2) + 'px';
+                  if (!img.style.top)  img.style.top  = ((h - ih) / 2) + 'px';
                 }
                 if (img.complete) centerOnce();
                 else img.addEventListener('load', centerOnce);
-
+            
                 let sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
-
+            
+                function getClientXY(e) {
+                  // 마우스/터치 이벤트 모두 지원
+                  if (e.touches && e.touches.length) {
+                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                  }
+                  if (e.changedTouches && e.changedTouches.length) {
+                    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+                  }
+                  return { x: e.clientX, y: e.clientY };
+                }
+            
                 const onDown = (e) => {
-                    dragging = true;
-                    img.style.cursor = 'grabbing';
-                    sx = e.clientX; sy = e.clientY;
-                    ox = parseFloat(img.style.left) || 0;
-                    oy = parseFloat(img.style.top)  || 0;
-                    e.preventDefault();
+                  const { x, y } = getClientXY(e);
+                  dragging = true;
+                  img.style.cursor = 'grabbing';
+                  sx = x; sy = y;
+                  ox = parseFloat(img.style.left) || 0;
+                  oy = parseFloat(img.style.top)  || 0;
+                  // 터치 스크롤/더블탭 확대 방지
+                  if (e.cancelable) e.preventDefault();
                 };
-
+            
                 const onMove = (e) => {
-                    if (!dragging) return;
-                    const w = wrap.clientWidth, h = wrap.clientHeight;
-                    const iw = img.clientWidth, ih = img.clientHeight;
-
-                    let nx = ox + (e.clientX - sx);
-                    let ny = oy + (e.clientY - sy);
-
-                    // 컨테이너 내부로만 제한
-                    nx = Math.max(0, Math.min(nx, w - iw));
-                    ny = Math.max(0, Math.min(ny, h - ih));
-
-                    img.style.left = nx + 'px';
-                    img.style.top  = ny + 'px';
-
-                    // 왼쪽 벽에 닿았을 때만 색 변경
-                    const NFCworking = nx <= 0; // 필요하면 여유값: nx <= 1
-                    wrap.classList.toggle('working', NFCworking);
+                  if (!dragging) return;
+                  const { x, y } = getClientXY(e);
+            
+                  const w = wrap.clientWidth, h = wrap.clientHeight;
+                  const iw = img.clientWidth, ih = img.clientHeight;
+            
+                  let nx = ox + (x - sx);
+                  let ny = oy + (y - sy);
+            
+                  // 컨테이너 내부로만 제한
+                  nx = Math.max(0, Math.min(nx, w - iw));
+                  ny = Math.max(0, Math.min(ny, h - ih));
+            
+                  img.style.left = nx + 'px';
+                  img.style.top  = ny + 'px';
+            
+                  // 왼쪽 벽에 닿았을 때만 색 변경
+                  const NFCworking = nx <= 0;
+                  wrap.classList.toggle('working', NFCworking);
+            
+                  // 터치 스크롤 방지
+                  if (e.cancelable) e.preventDefault();
                 };
-
-                const onUp = () => {
-                    dragging = false;
-                    img.style.cursor = 'grab';
+            
+                const onUp = (e) => {
+                  if (!dragging) return;
+                  dragging = false;
+                  img.style.cursor = 'grab';
+                  if (e && e.cancelable) e.preventDefault();
                 };
-
+            
                 // 마우스 이벤트
                 img.addEventListener('mousedown', onDown);
                 window.addEventListener('mousemove', onMove);
                 window.addEventListener('mouseup', onUp);
-            })();
+            
+                // 터치 이벤트 (passive: false로 스크롤 방지)
+                img.addEventListener('touchstart', onDown, { passive: false });
+                window.addEventListener('touchmove', onMove, { passive: false });
+                window.addEventListener('touchend', onUp, { passive: false });
+                window.addEventListener('touchcancel', onUp, { passive: false });
+              })();
         
             (() => {
                 const flow   = document.querySelector('#AirportSim .nft-flow');
