@@ -288,87 +288,39 @@
         .info-text { color: #7f8c8d; font-size: 18px; line-height: 1.6; }
         
         /* ============ 선택(Selection) 화면: 데스크톱 레이아웃 강제 ============ */
-        .selection-screen { 
-            display: none; 
-            text-align: center; 
-            width: 100%; 
-        }
-        
-        .selection-title { 
-            font-size: 28px; 
-            color: #2c3e50; 
-            margin-bottom: 40px; 
-            font-weight: 300; 
-        }
-        
+        .selection-screen { display: none; text-align: center; width: 100%; }
+        .selection-title { font-size: 28px; color: #2c3e50; margin-bottom: 40px; font-weight: 300; }
         .selection-buttons {
             display: flex;
             gap: 40px;
             justify-content: center;
             margin-bottom: 40px;
-            flex-wrap: nowrap; /* 줄바꿈 금지 */
+            flex-wrap: nowrap !important;      /* 줄바꿈 금지 */
         }
-        
         .method-btn {
             background: white;
             border: 3px solid #3498db;
-            padding: 40px 30px; /* 원래 패딩 */
+            padding: 40px 30px;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 200px; /* 원래 폭 */
+            width: 240px;                      /* 고정 폭 */
             text-align: center;
-            flex: 0 0 auto; /* 크기 강제 유지 */
         }
-        
         .method-btn:hover {
-            background: #3498db; 
-            color: white; 
-            transform: translateY(-5px);
+            background: #3498db; color: white; transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3);
         }
-        
-        .method-icon { 
-            font-size: 60px; /* 원래 아이콘 크기 */
-            margin-bottom: 20px; 
-        }
-        
-        .method-title { 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin-bottom: 10px; 
-        }
-        
-        .method-desc { 
-            font-size: 14px; 
-            opacity: 0.8; 
-        }
-        
+        .method-icon { font-size: 60px; margin-bottom: 20px; }
+        .method-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+        .method-desc { font-size: 14px; opacity: 0.8; }
         .selection-screen .action-buttons {
             display: flex;
             gap: 20px;
             justify-content: center;
-            flex-direction: row; /* 버튼 가로 유지 */
+            flex-direction: row !important;    /* 버튼 가로 유지 */
         }
-        
-        .selection-screen .btn { 
-            width: auto; 
-            max-width: none; 
-        }
-        
-        /* 모바일에서도 크기 고정 */
-        @media (max-width: 768px) {
-            .selection-buttons { 
-                flex-direction: row !important; 
-            }
-            .method-btn {
-                width: 200px !important;
-                padding: 40px 30px !important;
-            }
-            .method-icon {
-                font-size: 60px !important;
-            }
-        }
+        .selection-screen .btn { width: auto !important; max-width: none !important; }
 
 
         /* ============ NFC 화면: 데스크톱 레이아웃 강제 ============ */
