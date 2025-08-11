@@ -1,871 +1,520 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>K-Health Ticket - 블록체인 기반 디지털 진단서</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                line-height: 1.6;
-                color: #2c3e50;
-                overflow-x: hidden;
-            }
-
-            /* Header */
-            header {
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-                padding: 1rem 0;
-                position: fixed;
-                width: 100%;
-                top: 0;
-                z-index: 1000;
-                transition: all 0.3s ease;
-            }
-
-            .header-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 2rem;
-            }
-
-            .logo {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #4A90E2;
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-            /* 애니메이션 초기 상태 */
-                opacity: 0;
-                transform: scale(0.8);
-                animation: logoIntro 0.8s ease-out forwards;
-            }
-
-            /* 애니메이션 키프레임 */
-            @keyframes logoIntro {
-                0% {
-                    opacity: 0;
-                    transform: scale(0.8);
-                }
-                100% {
-                    opacity: 1;
-                    transform: scale(1);
-                }
-            }
-            
-            /* 이미지 로고 전용 스타일 */
-            .logo_respon {
-            max-width: 35px;
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 4px 6px rgba(66, 188, 147, 0.3));
-
-            /* 애니메이션 초기 상태 */
-            animation: pulseLogo 2s ease-in-out infinite;
-            }
-
-            /* 로고 구간 전체 애니메이션 설정 */
-            @keyframes pulseLogo {
-            0%   { transform: scale(1); }
-            50%  { transform: scale(1.10); }
-            100% { transform: scale(1); }
-            }
-
-            nav ul {
-                display: flex;
-                list-style: none;
-                gap: 2rem;
-            }
-
-            nav a {
-                color: #2c3e50;
-                text-decoration: none;
-                font-weight: 500;
-                transition: all 0.3s ease;
-                padding: 0.5rem 1rem;
-                border-radius: 8px;
-            }
-
-            nav a:hover {
-                color: #4A90E2;
-                background: rgba(74, 144, 226, 0.1);
-            }
-
-
-           
-
-
-
-
-            /*Hello section*/
-            .Hello{
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        
-                padding: 120px 0 80px;
-                min-height: 80vh;
-                display: flex;
-                align-items: center;
-            }
-            .Hello-container {
-                max-width: 1000px;
-                margin-left: 10rem;      
-                margin-right: auto;   
-                padding: 0 2rem;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 4rem;
-                align-items: center;
-            }
-            .Hello-content h1 {
-                font-size: 3.2rem;
-                font-weight: 700;
-                line-height: 1.2;
-                margin-bottom: 1.5rem;
-                color: #ffffff;
-
-                opacity: 0;                  
-                transform: translateY(30px); 
-                animation: fadeUp 2s ease-out forwards;
-                animation-delay: 0.3s;       
-            }
-            @keyframes fadeUp {
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .Hello-content .subtitle{
-                text-align: left;
-                font-size: 0.8rem;
-                color: #e2ecf5c8;
-                margin-top: 2rem;
-                margin-bottom: 3rem;
-                max-width: 600px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .logo-airport {
-                max-width: 80%;  /* 반응형 */
-                height: auto;
-                display: block;
-                margin: 0 0rem;   /* 이미지 가운데 정렬 */
-                opacity: 0;
-                transition: opacity 0.8s ease;
-            }
-
-            .logo-airport.show {
-                animation: fadePulse 2.5s ease-in-out infinite;
-            }
-
-            /* fade-out → fade-in 반복 */
-            @keyframes fadePulse {
-                0%, 100% {
-                    opacity: 0.3; /* 시작과 끝은 흐리게 */
-                }
-                50% {
-                    opacity: 1;   /* 중간에 선명하게 */
-                }
-            }
-
-
-        
-
-
-
-
-
-            /*AirportSim Section*/
-
-            .AirportSim {
-                background: #ffffff;
-                position: relative;
-                padding-bottom: 0;
-                margin-bottom: 0;
-            }
-
-            .AirportSim .title{
-                text-align: center;
-                font-size: 2.5rem;
-                font-weight: 700;
-                padding-top:5rem;
-                padding-bottom: 7rem;
-                color: #2c3e50;
-                
-                opacity: 0;
-                transform: translateY(40px); /* 아래에서 올라오는 효과 */
-                transition: opacity 0.8s ease, transform 0.8s ease;
-            }
-            .AirportSim .title.show {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            
-            .AirportSim .highlight{
-                color: #7e5eba;
-            }
-
-
-            .nft-flow {
-                display: grid;
-                grid-auto-flow: column;                 /* step → arrow → step → arrow 순서 유지 */
-                grid-auto-columns: 1fr min-content;     /* step은 1fr(유연), arrow는 내용 크기만 */
-                align-items: center;
-                gap: 28px;
-                padding: 14px;
-                background: #ffffff3e;
-                width: 100%;
-            }
-
-            .nft-flow > * {
-                transform: translateX(0);
-                transition: transform 0.8s ease;
-            }
-
-            .nft-flow.animate > * {
-                transform: translateX(50px); /* 오른쪽으로 이동 */
-            }
-
-            .nft-flow.animate-back > * {
-                transform: translateX(0); /* 원위치 */
-            }
-
-            /* 고정/숨김 상태 */
-            .nft-flow.is-fixed {
-                position: fixed;
-                top: var(--flowTop, 0px);
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                border-radius: 0;
-            }
-
-            .nft-flow.is-hidden {
-                display: none;
-            }
-
-            .nft-flow .step {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 64px;
-                padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.6vw, 28px);
-                border-radius: 12px;
-                background: #fff;
-                box-shadow: 0 6px 20px rgba(0, 0, 0, .06);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                font: 700 clamp(13px, 1.1vw, 18px)/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-                letter-spacing: .2px;
-            }
-
-            .nft-flow .arrow {
-                width: 28px;
-                height: 28px;
-                align-self: center;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 12px;
-                background: #eef6ff7a;
-                color: #fff;
-                font-weight: 800;
-                user-select: none;
-            }
-
-
-
-            /*simulation section*/
-        
-            .simulation {
-                padding: 50px 0;
-                background: linear-gradient(135deg, #667eead5 0%, #764ba2d0 100%);
-                display: flex;               
-                justify-content: center;     
-                align-items: center;         
-            }
-
-            /* 데스크탑 카드: 중앙 정렬 */
-            .desktop {
-                width: min(60vw, 1200px); 
-                aspect-ratio: 16 / 10;
-                min-height: 360px;
-                height: auto;
-                /* 중앙 정렬을 막던 우측 마진 제거 */
-                margin: 0;                   
-                border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-                overflow: hidden;
-                background:linear-gradient(180deg, rgba(33, 31, 31, 0.528), rgba(26, 13, 13, 0.344));
-                position: relative;
-            }
-
-            /* App window: 부모 안쪽으로 딱 맞게 */
-            .window {
-            position: absolute;
-            inset: 16px;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 18px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
-            backdrop-filter: blur(6px) saturate(120%);
-            background: #fff;              /* 실제 앱 배경은 흰색으로 */
-            display: flex;                 /* 자식 크기 계산 위해 flex */
-            min-width: 0;                  /* overflow 관련 안전장치 */
-            min-height: 0;
-            overflow: hidden;              /* 프레임 밖으로 안 튀게 */
-            user-select: auto;             /* 텍스트 선택 가능하게 */
-            }
-
-            /* iframe이 윈도우를 100% 채우도록 */
-            .site-embed {
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: block;                /* inline 기본 여백 제거 */
-            background: #fff;
-            }
-
-            /* 모바일: 폭만 줄이면 비율대로 높이 자동 */
-            @media (max-width: 640px) {
-            .desktop { width: 94vw; }
-            .window  { inset: 12px; }
-            }
-
-            .nfc {
-                width: 350px;       
-                height: 680px;
-                border-radius: 30px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-                position: relative;
-                overflow: hidden;
-                flex: 0 0 auto; 
-            }
-
-            .nfc img {
-                width: 50%;
-                height: 50%;
-                display: block;
-            }
-            .nfc.working {
-                background: linear-gradient(135deg, #91a5ffe8 0%, #cfa0ffea 100%);/* 닿았을 때 색상 */
-            }
-
-
-
-            /*lastment Section*/
-            .lastment{
-                padding: 100px 0;
-                background: #ffffff;
-            }
-            
-            .lastment .title{
-                text-align: center;
-                font-size: 3rem;
-                font-weight: 900;
-                padding-top: 4rem;
-                padding-bottom: 4rem;
-                color: #2c3e50;
-                
-                opacity: 0;
-                transform: scale(0.85);
-                transition: opacity 1s ease, transform 1s ease;
-            }
-            .lastment .title.show {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            .lastment .highlight{
-                    color: #7e5eba;
-                    display: inline-block; /* transform 적용 위해 inline-block 필요 */
-                    animation: pulseText 2s ease-in-out infinite;
-            }
-
-            @keyframes pulseText {
-                0%, 100% {
-                    transform: scale(1);
-                }
-                50% {
-                    transform: scale(1.03); /* 살짝 확대 */
-                }
-            }
-            
-
-
-
-
-
-
-            /* Footer */
-            footer {
-                background: #eef6ff;
-                padding: 60px 0 30px;
-                border-top: 1px solid rgba(0, 0, 0, 0.05);
-            }
-
-            .footer-content {
-                display: grid;
-                grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-                gap: 2.5rem;
-                margin-bottom: 2rem;
-                padding-left:2rem;
-                padding-right:1rem;
-            }
-
-            .footer-brand {
-                max-width: 300px;
-            }
-
-            .footer-brand .logo {
-                margin-bottom: 1rem;
-                font-size: 1.3rem;
-            }
-
-            .footer-brand p {
-                color: #5a6c7d;
-                line-height: 1.6;
-                margin-bottom: 1.5rem;
-            }
-
-            .footer-section h4 {
-                font-size: 1.1rem;
-                font-weight: 600;
-                margin-bottom: 1rem;
-                color: #4A90E2;
-            }
-
-            .footer-section a {
-                color: #5a6c7d;
-                text-decoration: none;
-                display: block;
-                margin-bottom: 0.5rem;
-                transition: color 0.3s ease;
-            }
-
-            .footer-section a:hover {
-                color: #4A90E2;
-            }
-
-            .footer-bottom {
-                border-top: 1px solid rgba(0, 0, 0, 0.05);
-                padding-top: 2rem;
-                padding-left:2rem;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-
-            .footer-bottom p {
-                color: #4A90E2;
-                font-size: 0.9rem;
-            }
-
-            .footer-links {
-                display: flex;
-                gap: 2rem;
-            }
-
-            .footer-links a {
-                color: #4A90E2;
-                text-decoration: none;
-                font-size: 0.9rem;
-                padding-right:2rem;
-                transition: color 0.3s ease;
-            }
-
-            .footer-links a:hover {
-                color: #4A90E2;
-            }
-
-        </style>
-    </head>
-
-    <body>
-        <!-- Header -->
-        <header>
-            <div class="header-container">
-                <div class="logo">
-                    <!--<div class="logo-icon">K</div>-->
-                    <img class="logo_respon" src="../images/KhealthticketLogo.png" alt="로고 이미지"> 
-                    K-Health Ticket
-                </div>
-                <nav>
-                    <ul>
-                        <li><a href="../index.html">홈</a></li>
-                        <li><a href="#features">서비스</a></li>
-                        <li><a href="#how-it-works">이용방법</a></li>
-                        <li><a href="#download">다운로드</a></li>
-                        <li><a href="#contact">문의</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-
-
-        <!-- Title Section -->
-        <section class="Hello" id="Hello">
-            <div class="Hello-container">
-                <div class="Hello-content">
-                    <h1>
-                        <span class="highlight">K-Health Ticket</span>,<br>
-                        공항에서도 3초만에 인증하세요!
-                    </h1>
-                    <div class="subtitle">
-                        블록체인 기술 의료티켓으로 안전하고 간편하게 활용하세요.<br>
-                        출국·입국 시 병원 방문 없이 건강 정보를 제출하고 검증할 수 있습니다.<br>
-                        위·변조 걱정 없이 국제적으로 신뢰받는 디지털 진료 증명서를 제공합니다.<br>
-                        빠른 절차로 여행과 업무에 더 많은 시간을 확보하세요.<br>
-                    </div>
-                </div>
-
-                <img class="logo-airport" src="../images/airportLogo.png" alt="공항로고">
-    
-            </div>
-        </section>
-
-
-        <!-- before simulation Section -->
-        <section class="AirportSim" id="AirportSim">
-            <div class="title" id="title">
-                <span class="highlight">K-Health ticket</span> 공항 Simulation
-                <h6>다음 절차를 따라해 보세요!</h6>
-            </div>
-            
-            <div class="nft-flow" role="list" aria-label="NFT 처방전 검증 절차">
-            <div class="step" role="listitem">NFT 처방전 검증 클릭</div>
-            <span class="arrow" aria-hidden="true">›</span>
-            <div class="step" role="listitem">NFC 태그 클릭</div>
-            <span class="arrow" aria-hidden="true">›</span>
-            <div class="step" role="listitem">휴대폰을 갖다 대세요</div>
-            <span class="arrow" aria-hidden="true">›</span>
-            <div class="step" role="listitem">스크롤하며 내역 확인</div>
-            </div>
-        </section>
-
-        <!-- simulation Section -->
-        <section class="simulation" id="simulation">
-            <div class="desktop" id="desktop">
-                <div class="window" id="window">
-                    <!-- 미니 웹사이트 시뮬레이션 -->
-                    <iframe id="siteFrame" class="site-embed"
-                        src="./a.html"
-                        title="웹 미리보기" loading="lazy">
-                    </iframe>
-                </div>
-            </div>
-
-            <div class="nfc" id="nfc">
-                <img src="../images/NFC.png" alt="nfc 스크린샷">
-            </div>
-        </section>
-
-        <section class="lastment" id="lastment">
-            <div class="title" id="title">
-                <span class="highlight">K-Health ticket</span>&nbsp;&nbsp;은<br>
-                기존과 다른<br>
-                의료 생태계를<br>
-                만들고 있습니다.<br>
-            </div>
-        </section>
-
-
-        <!-- Footer -->
-        <footer id="contact">
-            <div class="container">
-                <div class="footer-content">
-                    <div class="footer-brand">
-                        <div class="logo">
-                            K-Health Ticket
-                        </div>
-                        <p>블록체인 기반 디지털 의료 서비스의 선도 기업으로서, 안전하고 혁신적인 의료 솔루션을 제공합니다.</p>
-                    </div>
-                    <div class="footer-section">
-                        <h4>서비스</h4>
-                        <a href="#">어플리케이션 서비스</a>
-                        <a href="#">약국 연동 서비스</a>
-                        <a href="#">공항 인증 서비스</a>
-                        <a href="#">병원 포털 서비스</a>
-                    </div>
-                    <div class="footer-section">
-                        <h4>지원</h4>
-                        <a href="#">고객센터</a>
-                        <a href="#">자주 묻는 질문</a>
-                        <a href="#">사용 가이드</a>
-                        <a href="#">개발자 API</a>
-                    </div>
-                    <div class="footer-section">
-                        <h4>회사</h4>
-                        <a href="#">회사 소개</a>
-                        <a href="#">팀 소개</a>
-                        <a href="#">채용 정보</a>
-                        <a href="#">언론 보도</a>
-                    </div>
-                    <div class="footer-section">
-                        <h4>문의</h4>
-                        <a href="mailto:support@khealth-ticket.com">support@khealth-ticket.com</a>
-                        <a href="tel:1588-1234">1588-1234</a>
-                        <a href="#">경기도 성남시 판교역로 220</a>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <p>&copy; 2025 K-Health Ticket. All rights reserved.</p>
-                    <div class="footer-links">
-                        <a href="#">개인정보처리방침</a>
-                        <a href="#">이용약관</a>
-                        <a href="#">쿠키 정책</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-
-
-        <script>
-
-            //로고 효과
-            document.addEventListener("DOMContentLoaded", () => {
-            const airportLogo = document.querySelector(".logo-airport");
-            if (!airportLogo) return;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    airportLogo.classList.toggle("show", entry.isIntersecting);
-                });
-            }, { threshold: 0.2 });
-
-            observer.observe(airportLogo);
-            });
-
-            //두번째 섹션 타이틀과 절차 효과
-            document.addEventListener("DOMContentLoaded", () => {
-                const target = document.querySelector(".AirportSim .title");
-                if (!target) return;
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            target.classList.add("show");
-                        } else {
-                            target.classList.remove("show"); // 스크롤 내릴 때마다 반복하려면 제거
-                        }
-                    });
-                }, { threshold: 0.4 });
-
-                observer.observe(target);
-            });
-
-            document.addEventListener("DOMContentLoaded", () => {
-            const flow = document.querySelector(".nft-flow");
-            if (!flow) return;
-
-            const DUR = 800; // CSS transition 시간과 동일하게
-            let t1, t2, running = false;
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    if (running) return;           // 중복 방지
-                    running = true;
-
-                    flow.classList.remove("animate-back");
-                    flow.classList.add("animate");
-
-                    t1 = setTimeout(() => {
-                    flow.classList.remove("animate");
-                    flow.classList.add("animate-back");
-
-                    t2 = setTimeout(() => {
-                        // 다음 트리거를 위해 초기화
-                        flow.classList.remove("animate-back");
-                        running = false;
-                    }, DUR);
-                    }, DUR);
-
-                } else {
-                    // 화면에서 벗어나면 즉시 리셋 → 다시 들어올 때 또 실행
-                    clearTimeout(t1); clearTimeout(t2);
-                    flow.classList.remove("animate", "animate-back");
-                    running = false;
-                }
-                });
-            }, { threshold: 0.3 });
-
-            observer.observe(flow);
-            });
-
-
-
-            // --- Draggable NFC <img> (adapted from your window code) ---
-            (function () {
-            const wrap = document.querySelector('.nfc');     // 컨테이너
-            const img  = wrap?.querySelector('img');         // 드래그할 이미지
-            if (!wrap || !img) return;
-
-            // 컨테이너/이미지 위치 기준 설정
-            if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
-            img.style.position = 'absolute';
-            img.style.userSelect = 'none';
-            img.style.cursor = 'grab';
-
-            // 처음 한번 가운데 정렬
-            function centerOnce() {
-                const w = wrap.clientWidth, h = wrap.clientHeight;
-                const iw = img.clientWidth, ih = img.clientHeight;
-                if (!img.style.left) img.style.left = ((w - iw) / 2) + 'px';
-                if (!img.style.top)  img.style.top  = ((h - ih) / 2) + 'px';
-            }
-            if (img.complete) centerOnce();
-            else img.addEventListener('load', centerOnce);
-
-            let sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
-
-            const onDown = (e) => {
-                dragging = true;
-                img.style.cursor = 'grabbing';
-                sx = e.clientX; sy = e.clientY;
-                ox = parseFloat(img.style.left) || 0;
-                oy = parseFloat(img.style.top)  || 0;
-                e.preventDefault();
-            };
-
-            const onMove = (e) => {
-                if (!dragging) return;
-                const w = wrap.clientWidth, h = wrap.clientHeight;
-                const iw = img.clientWidth, ih = img.clientHeight;
-
-                let nx = ox + (e.clientX - sx);
-                let ny = oy + (e.clientY - sy);
-
-                // 컨테이너 내부로만 제한
-                nx = Math.max(0, Math.min(nx, w - iw));
-                ny = Math.max(0, Math.min(ny, h - ih));
-
-                img.style.left = nx + 'px';
-                img.style.top  = ny + 'px';
-
-                // 왼쪽 벽에 닿았을 때만 색 변경
-                const NFCworking = nx <= 0; // 필요하면 여유값: nx <= 1
-                wrap.classList.toggle('working', NFCworking);
-            };
-
-            const onUp = () => {
-                dragging = false;
-                img.style.cursor = 'grab';
-            };
-
-            // 마우스 이벤트 (원본 코드 스타일 유지)
-            img.addEventListener('mousedown', onDown);
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('mouseup', onUp);
-
-            
-        })();
-        
-        (() => {
-            const flow   = document.querySelector('#AirportSim .nft-flow');
-            const sec3   = document.querySelector('#simulation');
-            const header = document.querySelector('header');
-            if (!flow || !sec3) return;
-
-            // 3섹션 다음 <section> (없으면 null)
-            const nextSection = (el) => {
-                let n = el?.nextElementSibling;
-                while (n && n.tagName !== 'SECTION') n = n.nextElementSibling;
-                return n || null;
-            };
-            const sec4 = nextSection(sec3);
-
-            // 레이아웃 점프 방지 placeholder (고정 중에만 차지)
-            const ph = document.createElement('div');
-            ph.style.height = flow.offsetHeight + 'px';
-            ph.style.display = 'none';
-            flow.after(ph);
-
-            const setTop = () => {
-                const h = header?.offsetHeight || 0;
-                flow.style.setProperty('--flowTop', h + 'px');
-            };
-
-            const show  = () => flow.classList.remove('is-hidden');
-            const hide  = () => flow.classList.add('is-hidden');
-            const fix   = () => { setTop(); flow.classList.add('is-fixed'); ph.style.height = flow.offsetHeight + 'px'; ph.style.display = 'block'; };
-            const unfix = () => { flow.classList.remove('is-fixed'); ph.style.display = 'none'; };
-
-            // 문서 좌표 계산
-            const pageTop = () => window.scrollY || window.pageYOffset || 0;
-            const pageRect = (el) => {
-                const r = el.getBoundingClientRect();
-                const y = pageTop();
-                return { top: r.top + y, bottom: r.bottom + y, height: r.height };
-            };
-
-
-
-            //AirportSim Section의 절차 부분만 다음 섹션에서 상단바로 고정
-            function update() {
-                const h = header?.offsetHeight || 0;
-                const y = pageTop();
-
-                const s3 = pageRect(sec3);
-                const s4 = sec4 ? pageRect(sec4) : null;
-
-                const enterFix = y + h >= s3.top;                         // 헤더 하단이 3섹션 상단을 지난 순간
-                const leaveFix = s4 ? (y + h >= s4.top) : (y + h >= s3.bottom); // 4섹션 진입(있으면) 또는 3섹션 끝
-
-                if (!enterFix) {
-                // 3섹션 이전: 원래 자리, 보임
-                unfix(); show();
-                } else if (enterFix && !leaveFix) {
-                // 3섹션 구간: 고정, 보임
-                fix(); show();
-                } else {
-                // 4섹션부터: 숨김 + 고정 해제
-                hide(); unfix();
-                }
-            }
-
-            // 초기/스크롤/리사이즈에서 상태 업데이트
-            setTop();
-            update();
-            window.addEventListener('scroll',  update, { passive: true });
-            window.addEventListener('resize', () => { setTop(); update(); });
-            })();
-
-
-            //라스트 멘트 효과
-           document.addEventListener("DOMContentLoaded", () => {
-                const title = document.querySelector(".lastment .title");
-                if (!title) return;
-
-                const ioLastment = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                    title.classList.toggle("show", entry.isIntersecting);
-                    });
-                }, { threshold: 0.8 });
-
-                ioLastment.observe(title);
-            });
-       
-
-
-
-        </script>
-
-        
-
-
-    </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>K-Health Ticket - 블록체인 기반 디지털 진단서</title>
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #2c3e50;
+      overflow-x: hidden;
+      background: #fff;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+
+    /* ===== Header ===== */
+    header {
+      position: fixed; inset: 0 0 auto 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      z-index: 1000;
+      transition: all .3s ease;
+    }
+    .header-container {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.75rem clamp(1rem, 4vw, 2rem);
+      gap: 1rem;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 700; color: #4A90E2;
+      opacity: 0; transform: scale(0.8);
+      animation: logoIntro .8s ease-out forwards;
+    }
+    @keyframes logoIntro { to { opacity: 1; transform: scale(1);} }
+    .logo_respon {
+      max-width: 35px; height: auto; filter: drop-shadow(0 4px 6px rgba(66,188,147,.3));
+      animation: pulseLogo 2s ease-in-out infinite;
+    }
+    @keyframes pulseLogo {
+      0% { transform: scale(1);} 50% { transform: scale(1.1);} 100% { transform: scale(1);}
+    }
+    nav ul { list-style: none; display: flex; gap: clamp(.5rem, 2.5vw, 2rem); padding: 0; margin: 0; }
+    nav a {
+      color: #2c3e50; text-decoration: none; font-weight: 500;
+      padding: .5rem .75rem; border-radius: 8px; transition: all .3s ease;
+      font-size: clamp(.85rem, 1.6vw, 1rem);
+    }
+    nav a:hover { color: #4A90E2; background: rgba(74,144,226,.1); }
+
+    /* 앵커 점프 시 헤더에 안 가리도록 */
+    section { scroll-margin-top: 80px; }
+
+    /* ===== Hello (Hero) ===== */
+    .Hello {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: clamp(90px, 12vw, 120px) 0 clamp(40px, 8vw, 80px);
+      min-height: 80vh; display: flex; align-items: center;
+    }
+    .Hello-container {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 2rem);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(1.5rem, 5vw, 4rem); align-items: center;
+    }
+    .Hello-content h1 {
+      font-size: clamp(1.8rem, 4.2vw, 3.2rem);
+      font-weight: 700; line-height: 1.2; margin: 0 0 1rem; color: #fff;
+      opacity: 0; transform: translateY(30px);
+      animation: fadeUp 2s ease-out forwards; animation-delay: .3s;
+    }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0);} }
+    .Hello-content .subtitle {
+      text-align: left; font-size: clamp(.85rem, 1.5vw, 1rem);
+      color: #e2ecf5c8; margin: 1.25rem 0 0; max-width: 600px;
+    }
+    /* 공항 로고: 프레임 비율 유지 후 contain */
+    .logo-airport {
+      aspect-ratio: 3 / 2;         /* 필요 시 실제 이미지 비율로 조정 */
+      width: min(80%, 520px); height: auto; margin: 0 auto;
+      object-fit: contain; opacity: 0; transition: opacity .8s ease;
+    }
+    .logo-airport.show { animation: fadePulse 2.5s ease-in-out infinite; }
+    @keyframes fadePulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+    /* ===== AirportSim ===== */
+    .AirportSim { background: #fff; position: relative; padding-bottom: 0; margin-bottom: 0; }
+    .AirportSim .title {
+      text-align: center; font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+      font-weight: 700; padding: clamp(2rem, 6vw, 5rem) 1rem clamp(2.5rem, 7vw, 7rem);
+      color: #2c3e50; opacity: 0; transform: translateY(40px);
+      transition: opacity .8s ease, transform .8s ease;
+    }
+    .AirportSim .title.show { opacity: 1; transform: translateY(0); }
+    .AirportSim .title h6 {
+      margin: .5rem 0 0; font-weight: 600; color: #6c7a89; font-size: clamp(.9rem, 1.6vw, 1rem);
+    }
+    .AirportSim .highlight { color: #7e5eba; }
+
+    .nft-flow {
+      display: grid;
+      grid-auto-flow: column; grid-auto-columns: 1fr min-content;
+      align-items: center; gap: 28px; padding: 14px;
+      background: #ffffff3e; width: 100%;
+    }
+    .nft-flow > * { transform: translateX(0); transition: transform .8s ease; }
+    .nft-flow.animate > * { transform: translateX(50px); }
+    .nft-flow.animate-back > * { transform: translateX(0); }
+    .nft-flow.is-fixed {
+      position: fixed; top: var(--flowTop, 0px); left: 0; right: 0; z-index: 1000; border-radius: 0;
+    }
+    .nft-flow.is-hidden { display: none; }
+    .nft-flow .step {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 64px; padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.6vw, 28px);
+      border-radius: 12px; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.06);
+      overflow: hidden; text-overflow: ellipsis;
+      font: 700 clamp(13px, 1.1vw, 18px)/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+    }
+    .nft-flow .arrow {
+      width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 12px; background: #eef6ff7a; user-select: none;
+    }
+
+    /* ===== Simulation (시뮬레이터) ===== */
+    .simulation {
+      padding: clamp(30px, 6vw, 50px) 0;
+      background: linear-gradient(135deg, #667eead5 0%, #764ba2d0 100%);
+      display: flex; gap: clamp(16px, 4vw, 36px);
+      justify-content: center; align-items: center; flex-wrap: wrap;
+    }
+    .desktop {
+      /* 화면 크기 바뀌어도 동일한 카드 비율 유지 */
+      aspect-ratio: 16 / 10;
+      width: min(60vw, 1200px);
+      min-height: 360px;
+      height: auto;
+      margin: 0;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(33,31,31,.53), rgba(26,13,13,.34));
+      position: relative;
+    }
+    .window {
+      position: absolute; inset: clamp(10px, 1.6vw, 16px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: clamp(12px, 1.4vw, 18px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+      backdrop-filter: blur(6px) saturate(120%);
+      background: #fff; display: flex; min-width: 0; min-height: 0; overflow: hidden;
+    }
+    .site-embed { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+
+    /* NFC 카드도 고정 비율 유지 (원본 350x680 ≈ 35:68) */
+    .nfc {
+      aspect-ratio: 35 / 68;
+      width: clamp(220px, 24vw, 350px);
+      height: auto;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      position: relative; overflow: hidden; flex: 0 0 auto;
+      background: #fff;
+    }
+    .nfc.working {
+      background: linear-gradient(135deg, #91a5ffe8 0%, #cfa0ffea 100%);
+    }
+    .nfc img {
+      /* 드래그 스크립트와 동작하도록 절대 위치 + 사이즈는 컨테이너 비율 내에서 */
+      position: absolute; width: 50%; height: 50%; display: block;
+    }
+
+    /* ===== Lastment ===== */
+    .lastment { padding: clamp(60px, 10vw, 100px) 0; background: #fff; }
+    .lastment .title {
+      text-align: center; font-size: clamp(2rem, 5.4vw, 3rem); font-weight: 900;
+      padding: clamp(1.5rem, 4vw, 4rem) 1rem; color: #2c3e50;
+      opacity: 0; transform: scale(.85); transition: opacity 1s ease, transform 1s ease;
+    }
+    .lastment .title.show { opacity: 1; transform: scale(1); }
+    .lastment .highlight { color: #7e5eba; display: inline-block; animation: pulseText 2s ease-in-out infinite; }
+    @keyframes pulseText { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+
+    /* ===== Footer ===== */
+    footer {
+      background: #eef6ff; padding: 60px 0 30px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .footer-content {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: clamp(1rem, 3vw, 2.5rem); margin-bottom: 2rem;
+      padding: 0 clamp(1rem, 3vw, 2rem);
+    }
+    .footer-brand { max-width: 320px; }
+    .footer-brand .logo { margin-bottom: 1rem; font-size: clamp(1.1rem, 2vw, 1.3rem); }
+    .footer-brand p { color: #5a6c7d; margin-bottom: 1.5rem; }
+
+    .footer-section h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #4A90E2; }
+    .footer-section a {
+      color: #5a6c7d; text-decoration: none; display: block; margin-bottom: .5rem; transition: color .3s ease;
+    }
+    .footer-section a:hover { color: #4A90E2; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding-top: 2rem; padding-left: clamp(1rem, 3vw, 2rem);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { color: #4A90E2; font-size: .9rem; }
+    .footer-links { display: flex; gap: clamp(1rem, 3vw, 2rem); padding-right: clamp(1rem, 3vw, 2rem); }
+    .footer-links a { color: #4A90E2; text-decoration: none; font-size: .9rem; transition: color .3s ease; }
+    .footer-links a:hover { color: #4A90E2; }
+
+    /* ===== Responsive tweaks ===== */
+    @media (max-width: 980px) {
+      .Hello-container { grid-template-columns: 1fr; text-align: center; }
+      .Hello-content .subtitle { margin-left: auto; margin-right: auto; }
+    }
+    @media (max-width: 640px) {
+      .window { inset: 12px; }
+      .desktop { width: 94vw; } /* 16:10 유지하면서 폭만 축소 */
+      .nfc { width: clamp(200px, 40vw, 280px); } /* 35:68 유지 */
+      .footer-content { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <img class="logo_respon" src="../images/KhealthticketLogo.png" alt="로고 이미지">
+        K-Health Ticket
+      </div>
+      <nav>
+        <ul>
+          <li><a href="../index.html">홈</a></li>
+          <li><a href="#features">서비스</a></li>
+          <li><a href="#how-it-works">이용방법</a></li>
+          <li><a href="#download">다운로드</a></li>
+          <li><a href="#contact">문의</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hello (Hero) -->
+  <section class="Hello" id="Hello">
+    <div class="Hello-container">
+      <div class="Hello-content">
+        <h1>
+          <span class="highlight">K-Health Ticket</span>,<br>
+          공항에서도 3초만에 인증하세요!
+        </h1>
+        <div class="subtitle">
+          블록체인 기술 의료티켓으로 안전하고 간편하게 활용하세요.<br>
+          출국·입국 시 병원 방문 없이 건강 정보를 제출하고 검증할 수 있습니다.<br>
+          위·변조 걱정 없이 국제적으로 신뢰받는 디지털 진료 증명서를 제공합니다.<br>
+          빠른 절차로 여행과 업무에 더 많은 시간을 확보하세요.<br>
+        </div>
+      </div>
+      <img class="logo-airport" src="../images/airportLogo.png" alt="공항로고">
+    </div>
+  </section>
+
+  <!-- AirportSim -->
+  <section class="AirportSim" id="AirportSim">
+    <div class="title" id="title">
+      <span class="highlight">K-Health ticket</span> 공항 Simulation
+      <h6>다음 절차를 따라해 보세요!</h6>
+    </div>
+
+    <div class="nft-flow" role="list" aria-label="NFT 처방전 검증 절차">
+      <div class="step" role="listitem">NFT 처방전 검증 클릭</div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div class="step" role="listitem">NFC 태그 클릭</div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div class="step" role="listitem">휴대폰을 갖다 대세요</div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div class="step" role="listitem">스크롤하며 내역 확인</div>
+    </div>
+  </section>
+
+  <!-- Simulation -->
+  <section class="simulation" id="simulation">
+    <div class="desktop" id="desktop">
+      <div class="window" id="window">
+        <!-- 미니 웹사이트 시뮬레이션 -->
+        <iframe id="siteFrame" class="site-embed" src="./a.html" title="웹 미리보기" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <div class="nfc" id="nfc">
+      <img src="../images/NFC.png" alt="nfc 스크린샷">
+    </div>
+  </section>
+
+  <!-- Lastment -->
+  <section class="lastment" id="lastment">
+    <div class="title" id="title">
+      <span class="highlight">K-Health ticket</span>&nbsp;&nbsp;은<br>
+      기존과 다른<br>
+      의료 생태계를<br>
+      만들고 있습니다.<br>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="logo">K-Health Ticket</div>
+          <p>블록체인 기반 디지털 의료 서비스의 선도 기업으로서, 안전하고 혁신적인 의료 솔루션을 제공합니다.</p>
+        </div>
+        <div class="footer-section">
+          <h4>서비스</h4>
+          <a href="#">어플리케이션 서비스</a>
+          <a href="#">약국 연동 서비스</a>
+          <a href="#">공항 인증 서비스</a>
+          <a href="#">병원 포털 서비스</a>
+        </div>
+        <div class="footer-section">
+          <h4>지원</h4>
+          <a href="#">고객센터</a>
+          <a href="#">자주 묻는 질문</a>
+          <a href="#">사용 가이드</a>
+          <a href="#">개발자 API</a>
+        </div>
+        <div class="footer-section">
+          <h4>회사</h4>
+          <a href="#">회사 소개</a>
+          <a href="#">팀 소개</a>
+          <a href="#">채용 정보</a>
+          <a href="#">언론 보도</a>
+        </div>
+        <div class="footer-section">
+          <h4>문의</h4>
+          <a href="mailto:support@khealth-ticket.com">support@khealth-ticket.com</a>
+          <a href="tel:1588-1234">1588-1234</a>
+          <a href="#">경기도 성남시 판교역로 220</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 K-Health Ticket. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#">개인정보처리방침</a>
+          <a href="#">이용약관</a>
+          <a href="#">쿠키 정책</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 공항 로고 효과
+    document.addEventListener("DOMContentLoaded", () => {
+      const airportLogo = document.querySelector(".logo-airport");
+      if (!airportLogo) return;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          airportLogo.classList.toggle("show", entry.isIntersecting);
+        });
+      }, { threshold: 0.2 });
+      observer.observe(airportLogo);
+    });
+
+    // AirportSim 타이틀 효과
+    document.addEventListener("DOMContentLoaded", () => {
+      const target = document.querySelector(".AirportSim .title");
+      if (!target) return;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          target.classList.toggle("show", entry.isIntersecting);
+        });
+      }, { threshold: 0.4 });
+      observer.observe(target);
+    });
+
+    // nft-flow 애니메이션 트리거
+    document.addEventListener("DOMContentLoaded", () => {
+      const flow = document.querySelector(".nft-flow");
+      if (!flow) return;
+      const DUR = 800; let t1, t2, running = false;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (running) return;
+            running = true;
+            flow.classList.remove("animate-back");
+            flow.classList.add("animate");
+            t1 = setTimeout(() => {
+              flow.classList.remove("animate");
+              flow.classList.add("animate-back");
+              t2 = setTimeout(() => { flow.classList.remove("animate-back"); running = false; }, DUR);
+            }, DUR);
+          } else {
+            clearTimeout(t1); clearTimeout(t2);
+            flow.classList.remove("animate", "animate-back"); running = false;
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(flow);
+    });
+
+    // nft-flow 고정/숨김 로직 (헤더 높이 고려)
+    (() => {
+      const flow = document.querySelector('#AirportSim .nft-flow');
+      const sec3 = document.querySelector('#simulation');
+      const header = document.querySelector('header');
+      if (!flow || !sec3) return;
+
+      const nextSection = (el) => {
+        let n = el?.nextElementSibling;
+        while (n && n.tagName !== 'SECTION') n = n.nextElementSibling;
+        return n || null;
+      };
+      const sec4 = nextSection(sec3);
+
+      const ph = document.createElement('div');
+      ph.style.height = flow.offsetHeight + 'px'; ph.style.display = 'none';
+      flow.after(ph);
+
+      const setTop = () => {
+        const h = header?.offsetHeight || 0;
+        flow.style.setProperty('--flowTop', h + 'px');
+      };
+
+      const show = () => flow.classList.remove('is-hidden');
+      const hide = () => flow.classList.add('is-hidden');
+      const fix  = () => { setTop(); flow.classList.add('is-fixed'); ph.style.height = flow.offsetHeight + 'px'; ph.style.display = 'block'; };
+      const unfix= () => { flow.classList.remove('is-fixed'); ph.style.display = 'none'; };
+
+      const pageTop = () => window.scrollY || window.pageYOffset || 0;
+      const pageRect = (el) => { const r = el.getBoundingClientRect(); const y = pageTop(); return { top:r.top + y, bottom:r.bottom + y, height:r.height }; };
+
+      function update() {
+        const h = header?.offsetHeight || 0;
+        const y = pageTop();
+        const s3 = pageRect(sec3);
+        const s4 = sec4 ? pageRect(sec4) : null;
+
+        const enterFix = y + h >= s3.top;
+        const leaveFix = s4 ? (y + h >= s4.top) : (y + h >= s3.bottom);
+
+        if (!enterFix) { unfix(); show(); }
+        else if (enterFix && !leaveFix) { fix(); show(); }
+        else { hide(); unfix(); }
+      }
+
+      setTop(); update();
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', () => { setTop(); update(); });
+    })();
+
+    // 드래그 가능한 NFC 이미지
+    (function () {
+      const wrap = document.querySelector('.nfc');
+      const img  = wrap?.querySelector('img');
+      if (!wrap || !img) return;
+
+      if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+      img.style.position = 'absolute';
+      img.style.userSelect = 'none';
+      img.style.cursor = 'grab';
+
+      function centerOnce() {
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        const iw = img.clientWidth, ih = img.clientHeight;
+        if (!img.style.left) img.style.left = ((w - iw) / 2) + 'px';
+        if (!img.style.top)  img.style.top  = ((h - ih) / 2) + 'px';
+      }
+      if (img.complete) centerOnce(); else img.addEventListener('load', centerOnce);
+
+      let sx=0, sy=0, ox=0, oy=0, dragging=false;
+
+      const onDown = (e) => {
+        dragging = true; img.style.cursor = 'grabbing';
+        sx = e.clientX; sy = e.clientY;
+        ox = parseFloat(img.style.left) || 0; oy = parseFloat(img.style.top)  || 0;
+        e.preventDefault();
+      };
+      const onMove = (e) => {
+        if (!dragging) return;
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        const iw = img.clientWidth, ih = img.clientHeight;
+        let nx = ox + (e.clientX - sx); let ny = oy + (e.clientY - sy);
+        nx = Math.max(0, Math.min(nx, w - iw)); ny = Math.max(0, Math.min(ny, h - ih));
+        img.style.left = nx + 'px'; img.style.top = ny + 'px';
+        wrap.classList.toggle('working', nx <= 0);
+      };
+      const onUp = () => { dragging = false; img.style.cursor = 'grab'; };
+
+      img.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    })();
+
+    // 라스트 멘트 효과
+    document.addEventListener("DOMContentLoaded", () => {
+      const title = document.querySelector(".lastment .title");
+      if (!title) return;
+      const ioLastment = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { title.classList.toggle("show", entry.isIntersecting); });
+      }, { threshold: 0.8 });
+      ioLastment.observe(title);
+    });
+  </script>
+</body>
 </html>
