@@ -5,16 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>K-Health Ticket - 블록체인 기반 디지털 진단서</title>
 <style>
-  /* ====== Design Baseline ======
-     - 기준 캔버스(디자인) 사이즈: 1440 x 900 (16:10)
-     - 섹션별 프레임도 동일 비율로 구성해 "같은 화면 비율" 유지
-  */
+  /* ===== Design Baseline ===== */
   :root{
-    --design-w: 1440;
-    --design-h: 900;
-    --scale: 1;                  /* JS가 계산해서 갱신 */
-    --header-h: 80;              /* 디자인 기준 헤더 높이(px) */
-    --gap: 24;                   /* 디자인 기준 기본 간격 */
+    --design-w: 1440;  /* 기준 가로 */
+    --design-h: 900;   /* 기준 세로 (16:10) */
+    --scale: 1;        /* JS로 계산 */
+    --header-h: 80;    /* 디자인 기준 헤더 높이(px) */
   }
 
   /* Reset */
@@ -29,12 +25,9 @@
   }
   img{ display:block; max-width:100%; height:auto; }
 
-  /* ====== Header (Scaled) ======
-     - 헤더도 비율 유지하도록 높이/패딩을 scale 기반으로 계산
-  */
+  /* ===== Header (scaled) ===== */
   header{
-    position: fixed;
-    inset: 0 0 auto 0;
+    position: fixed; inset: 0 0 auto 0;
     height: calc(var(--header-h) * 1px * var(--scale));
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
@@ -74,26 +67,18 @@
   }
   nav a:hover{ color:#4A90E2; background: rgba(74,144,226,.12); }
 
-  /* ====== Stage & Section Frames ======
-     - 각 섹션을 "프레임"으로 감싸고 그 안에서 절대좌표 + % 레이아웃
-     - 프레임은 aspect-ratio로 비율 고정, width는 100vw(또는 컨테이너 폭)에 맞춤
-  */
+  /* ===== Section Frame ===== */
   .section{
     padding-top: calc(var(--header-h) * 1px * var(--scale)); /* 헤더만큼 내려 시작 */
     position: relative;
   }
-
-  /* 공통 프레임: 16:10 비율 고정 */
   .frame{
     width: 100vw;
-    max-width: calc(var(--design-w) * 1px); /* 데스크톱에서 더 커지지 않게 */
-    aspect-ratio: 16 / 10;
+    max-width: calc(var(--design-w) * 1px); /* 데스크톱에서 과확대 방지 */
+    aspect-ratio: 16 / 10;                  /* 비율 고정 */
     margin: 0 auto;
     position: relative;
-    /* 프레임 테두리 확인용 (필요시 주석)
-    outline: 1px dashed rgba(0,0,0,.08); */
   }
-  /* 프레임 내부 컨텐츠는 디자인 픽셀 좌표계를 그대로 쓰되 scale로 축소 */
   .frame-inner{
     position: absolute; inset: 0;
     width: calc(var(--design-w) * 1px);
@@ -102,12 +87,12 @@
     transform: scale(var(--scale));
     overflow: hidden;
   }
+  .spacer{ height: calc(80px * var(--scale)); }
 
-  /* ====== Hello (Hero) ====== */
+  /* ===== Hello (Hero) ===== */
   .hello{
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
-  /* 디자인 기준 좌표: 텍스트 블록 */
   .hello .title{
     position:absolute; left: 120px; top: 180px; width: 520px;
   }
@@ -121,7 +106,6 @@
   }
   @keyframes fadeUp{ to{ opacity:1; transform: translateY(0);} }
 
-  /* 오른쪽 공항 로고 이미지 */
   .hello .airport{
     position:absolute; right: 110px; top: 150px; width: 600px; height: 400px;
     display:flex; align-items:center; justify-content:center;
@@ -132,20 +116,15 @@
   }
   @keyframes fadePulse{ 0%,100%{opacity:.3} 50%{opacity:1} }
 
-  /* ====== NFT Flow ====== */
-  .flow{
-    background: #fff;
-  }
+  /* ===== NFT Flow ===== */
+  .flow{ background:#fff; }
   .flow .title{
-    position:absolute; left: 0; right:0; top: 80px; text-align:center;
-    font-size: 36px; font-weight: 800; color:#2c3e50;
-    opacity:0; transform: translateY(24px);
-    transition: .6s ease;
+    position:absolute; left:0; right:0; top:80px; text-align:center;
+    font-size:36px; font-weight:800; color:#2c3e50;
+    opacity:0; transform: translateY(24px); transition: .6s ease;
   }
   .flow .title.show{ opacity:1; transform: translateY(0); }
-  .flow .title h6{ margin: 6px 0 0; font-size:16px; color:#6c7a89; }
-
-  /* NFT 절차 박스 위치/비율 고정 (디자인 기준) */
+  .flow .title h6{ margin:6px 0 0; font-size:16px; color:#6c7a89; }
   .flow .flow-box{
     position:absolute; left: 120px; right: 120px; top: 200px; height: 120px;
     display:grid; grid-auto-flow: column; grid-auto-columns: 1fr min-content;
@@ -163,44 +142,85 @@
     width: 28px; height: 28px; display:inline-flex; align-items:center; justify-content:center;
     border-radius: 10px; background:#eef6ff; user-select:none;
   }
-  /* 진입 애니메이션 */
   .flow.animate .flow-box > *{ transform: translateX(50px); transition: transform .8s ease; }
   .flow.animate-back .flow-box > *{ transform: translateX(0); }
 
-  /* ====== Simulation ====== */
-  .simul{
+  /* ===== Simulation (모니터 안에 데스크톱+폰) ===== */
+  .simul {
     background: linear-gradient(135deg, #667eead0 0%, #764ba2cf 100%);
   }
-  /* 데스크톱 카드(16:10)는 프레임 왼쪽에 고정 배치 */
-  .simul .desktop{
-    position:absolute; left: 80px; top: 120px; width: 880px; height: 550px;
-    border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.2); overflow:hidden;
+  .simul .monitor {
+    position: absolute;
+    left: 160px; top: 100px; width: 1120px; height: 680px;
+    border-radius: 24px; background: #111;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35); overflow: visible;
+  }
+  .simul .monitor-window {
+    position: absolute; inset: 22px 22px 70px 22px;
+    background: #0e0e0f; border-radius: 16px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 24px rgba(0,0,0,0.45);
+    overflow: hidden; display: grid; grid-template-columns: 2fr 1fr; gap: 18px; padding: 18px;
+  }
+  .simul .monitor::after {
+    content: ""; position: absolute; bottom: -36px; left: 50%; transform: translateX(-50%);
+    width: 160px; height: 36px; background: linear-gradient(180deg, #222, #0f0f10);
+    border-radius: 0 0 16px 16px; box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  }
+  .simul .monitor::before {
+    content: ""; position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%);
+    width: 360px; height: 20px; background: radial-gradient(ellipse at center, #1b1b1d, #0d0d0e);
+    border-radius: 24px; filter: blur(.2px); box-shadow: 0 6px 22px rgba(0,0,0,0.4);
+  }
+
+  /* 왼쪽: 데스크톱 16:10 */
+  .simul .device-desktop{
+    position: relative;
+    border-radius: 16px;
     background: linear-gradient(180deg, rgba(33,31,31,.53), rgba(26,13,13,.34));
+    box-shadow: 0 16px 36px rgba(0,0,0,0.28); overflow: hidden;
+    display: grid; grid-template-rows: 1fr;
   }
-  .simul .window{
-    position:absolute; inset: 16px; border:1px solid rgba(255,255,255,.12);
-    border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
-    backdrop-filter: blur(6px) saturate(120%); background:#fff; overflow:hidden;
+  .simul .device-desktop::after{
+    content:""; position:absolute; inset:0;
+    background: radial-gradient(120% 120% at -10% -10%, rgba(255,255,255,0.08), transparent 40%),
+                radial-gradient(120% 120% at 110% -10%, rgba(255,255,255,0.05), transparent 40%);
+    pointer-events:none;
   }
-  .simul .site-embed{ width:100%; height:100%; border:0; display:block; background:#fff; }
+  .simul .desktop-window{
+    position: relative; border:1px solid rgba(255,255,255,0.12);
+    border-radius: 14px; margin: 12px; overflow: hidden; background:#fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .simul .desktop-window iframe{ width:100%; height:100%; border:0; display:block; background:#fff; }
 
-  /* NFC 카드(원본 350x680 ≈ 35:68)는 오른쪽에 고정 배치 */
-  .simul .nfc{
-    position:absolute; right: 120px; top: 150px; width: 350px; height: 680px;
-    border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,.12); background:#fff; overflow:hidden;
+  /* 오른쪽: 폰 35:68 */
+  .simul .device-phone{
+    position: relative;
+    border-radius: 28px; background:#0c0c0d; padding: 12px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.28);
+    display: grid; grid-template-rows: 1fr; align-items:center; justify-items:center;
   }
-  .simul .nfc.working{
-    background: linear-gradient(135deg, #91a5ffe8 0%, #cfa0ffea 100%);
+  .simul .phone-body{
+    width: 100%; aspect-ratio: 35 / 68; border-radius: 24px;
+    background:#fff; position: relative; overflow: hidden;
   }
-  .simul .nfc img{
-    position:absolute; width: 50%; height: 50%; object-fit: contain;
-    left:25%; top:25%; user-select:none; cursor:grab;
+  .simul .phone-notch{
+    position: absolute; left:50%; transform:translateX(-50%); top:0;
+    width: 40%; height: 18px; border-bottom-left-radius:14px; border-bottom-right-radius:14px;
+    background:#0c0c0d;
+  }
+  .simul .phone-screen{
+    position: absolute; inset: 8px; border-radius: 18px; background:#fff;
+    overflow: hidden; display: grid; place-items: center;
+    touch-action: none; /* 터치 드래그 위한 기본 제스처 비활성화 */
+  }
+  .simul .phone-screen img{
+    width: 55%; height: 55%; object-fit: contain;
+    user-select: none; cursor: grab; position: absolute;
   }
 
-  /* ====== Lastment (텍스트만) ====== */
-  .last{
-    background:#fff;
-  }
+  /* ===== Lastment ===== */
+  .last{ background:#fff; }
   .last .title{
     position:absolute; left: 0; right:0; top: 180px; text-align:center;
     font-size: 48px; font-weight: 900; color:#2c3e50;
@@ -209,133 +229,129 @@
   .last .title.show{ opacity:1; transform: scale(1); }
   .last .highlight{ color:#7e5eba; display:inline-block; animation: pulseText 2s ease-in-out infinite; }
   @keyframes pulseText{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
-
-  /* 섹션 간 여백: 프레임 아래로 여백을 추가해 스크롤 여지 확보 */
-  .spacer{ height: calc(80px * var(--scale)); }
 </style>
 </head>
 <body>
 
-  <!-- Header (비율 스케일 적용) -->
-  <header>
-    <div class="header-inner">
-      <div class="brand">
-        <img src="../images/KhealthticketLogo.png" alt="로고">
-        K-Health Ticket
-      </div>
-      <nav>
-        <ul>
-          <li><a href="../index.html">홈</a></li>
-          <li><a href="#hello">서비스</a></li>
-          <li><a href="#flow">이용방법</a></li>
-          <li><a href="#simul">다운로드</a></li>
-          <li><a href="#contact">문의</a></li>
-        </ul>
-      </nav>
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <img src="../images/KhealthticketLogo.png" alt="로고">
+      K-Health Ticket
     </div>
-  </header>
+    <nav>
+      <ul>
+        <li><a href="../index.html">홈</a></li>
+        <li><a href="#hello">서비스</a></li>
+        <li><a href="#flow">이용방법</a></li>
+        <li><a href="#simul">다운로드</a></li>
+        <li><a href="#contact">문의</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-  <!-- Hello -->
-  <section id="hello" class="section hello">
-    <div class="frame">
-      <div class="frame-inner">
-        <div class="title">
-          <h1><span style="color:#fff;font-weight:900">K-Health Ticket</span>,<br>공항에서도 3초만에 인증하세요!</h1>
-          <div class="subtitle">
-            블록체인 기술 의료티켓으로 안전하고 간편하게 활용하세요.<br>
-            출국·입국 시 병원 방문 없이 건강 정보를 제출하고 검증할 수 있습니다.<br>
-            위·변조 걱정 없이 국제적으로 신뢰받는 디지털 진료 증명서를 제공합니다.<br>
-            빠른 절차로 여행과 업무에 더 많은 시간을 확보하세요.
+<!-- Hello -->
+<section id="hello" class="section hello">
+  <div class="frame">
+    <div class="frame-inner">
+      <div class="title">
+        <h1><span style="color:#fff;font-weight:900">K-Health Ticket</span>,<br>공항에서도 3초만에 인증하세요!</h1>
+        <div class="subtitle">
+          블록체인 기술 의료티켓으로 안전하고 간편하게 활용하세요.<br>
+          출국·입국 시 병원 방문 없이 건강 정보를 제출하고 검증할 수 있습니다.<br>
+          위·변조 걱정 없이 국제적으로 신뢰받는 디지털 진료 증명서를 제공합니다.<br>
+          빠른 절차로 여행과 업무에 더 많은 시간을 확보하세요.
+        </div>
+      </div>
+      <div class="airport">
+        <img src="../images/airportLogo.png" alt="공항 로고">
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</section>
+
+<!-- NFT Flow -->
+<section id="flow" class="section flow">
+  <div class="frame">
+    <div class="frame-inner">
+      <div class="title" id="flowTitle">
+        <span style="color:#7e5eba">K-Health ticket</span> 공항 Simulation
+        <h6>다음 절차를 따라해 보세요!</h6>
+      </div>
+
+      <div class="flow-box" id="flowBox" role="list" aria-label="NFT 처방전 검증 절차">
+        <div class="step" role="listitem">NFT 처방전 검증 클릭</div>
+        <span class="arrow" aria-hidden="true">›</span>
+        <div class="step" role="listitem">NFC 태그 클릭</div>
+        <span class="arrow" aria-hidden="true">›</span>
+        <div class="step" role="listitem">휴대폰을 갖다 대세요</div>
+        <span class="arrow" aria-hidden="true">›</span>
+        <div class="step" role="listitem">스크롤하며 내역 확인</div>
+      </div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+</section>
+
+<!-- Simulation (모니터 안에 데스크톱+폰) -->
+<section id="simul" class="section simul">
+  <div class="frame">
+    <div class="frame-inner">
+      <div class="monitor">
+        <div class="monitor-window">
+          <!-- 데스크톱(좌) -->
+          <div class="device-desktop">
+            <div class="desktop-window">
+              <iframe class="site-embed" src="./a.html" title="웹 미리보기" loading="lazy"></iframe>
+            </div>
+          </div>
+          <!-- 폰(우) -->
+          <div class="device-phone">
+            <div class="phone-body">
+              <div class="phone-notch"></div>
+              <div class="phone-screen" id="phoneScreen">
+                <img src="../images/NFC.png" alt="NFC" id="nfcImg">
+              </div>
+            </div>
           </div>
         </div>
-        <div class="airport">
-          <img src="../images/airportLogo.png" alt="공항 로고">
-        </div>
+      </div><!-- /monitor -->
+    </div>
+  </div>
+  <div class="spacer"></div>
+</section>
+
+<!-- Lastment -->
+<section class="section last" id="contact">
+  <div class="frame">
+    <div class="frame-inner">
+      <div class="title" id="lastTitle">
+        <span class="highlight">K-Health ticket</span>&nbsp;&nbsp;은<br>
+        기존과 다른<br>
+        의료 생태계를<br>
+        만들고 있습니다.<br>
       </div>
     </div>
-    <div class="spacer"></div>
-  </section>
-
-  <!-- NFT Flow -->
-  <section id="flow" class="section flow">
-    <div class="frame">
-      <div class="frame-inner">
-        <div class="title" id="flowTitle">
-          <span style="color:#7e5eba">K-Health ticket</span> 공항 Simulation
-          <h6>다음 절차를 따라해 보세요!</h6>
-        </div>
-
-        <div class="flow-box" id="flowBox" role="list" aria-label="NFT 처방전 검증 절차">
-          <div class="step" role="listitem">NFT 처방전 검증 클릭</div>
-          <span class="arrow" aria-hidden="true">›</span>
-          <div class="step" role="listitem">NFC 태그 클릭</div>
-          <span class="arrow" aria-hidden="true">›</span>
-          <div class="step" role="listitem">휴대폰을 갖다 대세요</div>
-          <span class="arrow" aria-hidden="true">›</span>
-          <div class="step" role="listitem">스크롤하며 내역 확인</div>
-        </div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-  </section>
-
-  <!-- Simulation -->
-  <section id="simul" class="section simul">
-    <div class="frame">
-      <div class="frame-inner">
-        <div class="desktop">
-          <div class="window">
-            <iframe class="site-embed" src="./a.html" title="웹 미리보기" loading="lazy"></iframe>
-          </div>
-        </div>
-
-        <div class="nfc" id="nfc">
-          <img src="../images/NFC.png" alt="NFC">
-        </div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-  </section>
-
-  <!-- Lastment -->
-  <section class="section last" id="contact">
-    <div class="frame">
-      <div class="frame-inner">
-        <div class="title" id="lastTitle">
-          <span class="highlight">K-Health ticket</span>&nbsp;&nbsp;은<br>
-          기존과 다른<br>
-          의료 생태계를<br>
-          만들고 있습니다.<br>
-        </div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-  </section>
+  </div>
+  <div class="spacer"></div>
+</section>
 
 <script>
-  /* ====== 1) Scale 계산: 뷰포트 폭 기준으로 비율 유지 ======
-     - 디자인 폭 1440px 기준으로 축소/확대
-     - 필요 시 높이 제약까지 고려하려면 min(가로스케일, 세로스케일) 사용 가능
-  */
+  /* ===== 1) Scale: 뷰포트에 맞춰 전체 비율 유지 ===== */
   function computeScale(){
     const designW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-w')) || 1440;
     const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-    // 세로까지 강제하려면 아래 두 줄 활성화:
-    // const designH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--design-h')) || 900;
-    // const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
     let s = vw / designW;
-    // 세로 비율까지 엄격히 맞추려면:
-    // s = Math.min(vw / designW, vh / designH);
-
-    // 너무 크게 확대하지 않게(원본 이상 확대 방지하고 싶으면 1로 캡)
-    s = Math.min(s, 1);
+    s = Math.min(s, 1); // 원본 이상 확대 방지 (원하면 제거 가능)
     document.documentElement.style.setProperty('--scale', s.toString());
   }
   computeScale();
   window.addEventListener('resize', computeScale);
 
-  /* ====== 2) 관찰자: 타이틀/플로우 애니메이션 ====== */
+  /* ===== 2) Hello/NFT Flow 타이틀/애니메이션 ===== */
   const ioTitle = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       const el = e.target;
@@ -352,9 +368,8 @@
   if(flowBox){
     const ioFlow = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{
-        const frame = flowBox.closest('.frame')?.parentElement; // section
-        if(!frame) return;
-        const sec = frame.parentElement;
+        const sec = document.getElementById('flow');
+        if(!sec) return;
         if(e.isIntersecting){
           sec.classList.remove('animate-back');
           sec.classList.add('animate');
@@ -367,13 +382,13 @@
     ioFlow.observe(flowBox);
   }
 
-  /* ====== 3) 드래그 가능한 NFC 이미지 ====== */
+  /* ===== 3) 모바일 터치/데스크톱 마우스 드래그 (Pointer Events 공통 처리) ===== */
   (function(){
-    const wrap = document.getElementById('nfc');
-    const img = wrap?.querySelector('img');
+    const wrap = document.getElementById('phoneScreen');
+    const img  = document.getElementById('nfcImg');
     if(!wrap || !img) return;
 
-    // 중심 배치
+    // 초기 중앙 배치
     function center(){
       const w = wrap.clientWidth, h = wrap.clientHeight;
       const iw = img.clientWidth, ih = img.clientHeight;
@@ -381,31 +396,44 @@
       img.style.top  = ((h - ih)/2) + 'px';
     }
     img.style.position = 'absolute';
+    img.style.userSelect = 'none';
+    img.style.touchAction = 'none'; // iOS 사파리 제스처 방지
     img.style.cursor = 'grab';
     if(img.complete) center(); else img.addEventListener('load', center);
+    window.addEventListener('resize', center);
 
-    let sx=0,sy=0,ox=0,oy=0,drag=false;
-    img.addEventListener('mousedown', (e)=>{
-      drag = true; img.style.cursor='grabbing';
-      sx = e.clientX; sy = e.clientY;
-      ox = parseFloat(img.style.left)||0; oy = parseFloat(img.style.top)||0;
+    let startX=0, startY=0, originX=0, originY=0, dragging=false;
+
+    function onPointerDown(e){
+      dragging = true;
+      img.setPointerCapture?.(e.pointerId);
+      img.style.cursor = 'grabbing';
+      startX = e.clientX; startY = e.clientY;
+      originX = parseFloat(img.style.left) || 0;
+      originY = parseFloat(img.style.top)  || 0;
       e.preventDefault();
-    });
-    window.addEventListener('mousemove', (e)=>{
-      if(!drag) return;
+    }
+    function onPointerMove(e){
+      if(!dragging) return;
       const w = wrap.clientWidth, h = wrap.clientHeight;
       const iw = img.clientWidth, ih = img.clientHeight;
-      let nx = ox + (e.clientX - sx);
-      let ny = oy + (e.clientY - sy);
+      let nx = originX + (e.clientX - startX);
+      let ny = originY + (e.clientY - startY);
       nx = Math.max(0, Math.min(nx, w - iw));
       ny = Math.max(0, Math.min(ny, h - ih));
       img.style.left = nx + 'px';
       img.style.top  = ny + 'px';
-      wrap.classList.toggle('working', nx <= 0);
-    });
-    window.addEventListener('mouseup', ()=>{
-      drag=false; img.style.cursor='grab';
-    });
+    }
+    function onPointerUp(e){
+      dragging = false;
+      img.releasePointerCapture?.(e.pointerId);
+      img.style.cursor = 'grab';
+    }
+
+    img.addEventListener('pointerdown', onPointerDown, { passive:false });
+    window.addEventListener('pointermove', onPointerMove, { passive:false });
+    window.addEventListener('pointerup', onPointerUp, { passive:true });
+    window.addEventListener('pointercancel', onPointerUp, { passive:true });
   })();
 </script>
 </body>
