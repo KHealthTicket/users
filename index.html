@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Health Ticket - 블록체인 기반 디지털 진단서</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4A90E2;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          /* 애니메이션 초기 상태 */
+            opacity: 0;
+            transform: scale(0.8);
+            animation: logoIntro 0.8s ease-out forwards;
+        }
+
+        /* 애니메이션 키프레임 */
+        @keyframes logoIntro {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* 이미지 로고 전용 스타일 */
+        .logo_respon {
+        max-width: 35px;
+        height: auto;
+        display: block;
+        filter: drop-shadow(0 4px 6px rgba(66, 188, 147, 0.3));
+
+        /* 애니메이션 초기 상태 */
+        animation: pulseLogo 2s ease-in-out infinite;
+        }
+
+        /* 로고 구간 전체 애니메이션 설정 */
+        @keyframes pulseLogo {
+        0%   { transform: scale(1); }
+        50%  { transform: scale(1.10); }
+        100% { transform: scale(1); }
+        }
+        
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        nav a:hover {
+            color: #4A90E2;
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+            padding: 120px 0 80px;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+
+              opacity: 0;                  /* 처음에 안 보이게 */
+              transform: translateY(30px); /* 살짝 아래에서 시작 */
+              animation: fadeUp 2s ease-out forwards;
+              animation-delay: 0.3s;       /* 페이지 열리고 0.3초 뒤 실행 */
+            }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+
+        .hero-content h1 .highlight {
+            color: #4A90E2;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: #5a6c7d;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn-primary {
+            background: #4A90E2;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4A90E2;
+            padding: 1rem 2rem;
+            border: 2px solid #4A90E2;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #4A90E2;
+            color: white;
+        }
+
+        .hero-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4A90E2, #67B26F);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+
+            background-size: 200% 200%; /* 부드러운 이동 위해 필요 */
+            animation: gradientFlow 3s ease-in-out infinite; /* 3초로 변경 */
+        }
+
+        /* 그라데이션 흐르는 애니메이션 */
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .phone-screen img {
+            display: block;      
+            margin: 0 auto;      
+            width: 80px;         
+            height: auto; 
+            margin-bottom: 1rem;        
+
+            animation: fadeBlink 3s ease-in-out infinite; 
+        }
+
+        @keyframes fadeBlink {
+            0%, 100% {
+                opacity: 1; /* 완전히 보임 */
+            }
+            50% {
+                opacity: 0; /* 사라짐 */
+            }
+        }
+
+        .phone-content {
+            padding: 2rem;
+        }
+
+        .phone-content h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .phone-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+
+
+        /*why-KHT Section*/
+        .why-KHT {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #4A90E2, #67B26F);
+        }
+
+        .why-KHT .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            
+            /* 초기 상태 */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* 보일 때 활성화 상태 */
+        .why-KHT .section-title.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+
+        .why-KHT .section-subtitle{
+            text-align: center;
+            font-size: 1.2rem;
+            color: #f0f8ff;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .why-KHT .highlight {
+            font-weight: 700;         /* 굵게 */
+            background: linear-gradient(90deg, #90fbc2, #5ce6fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; /* 그라데이션 텍스트 */
+        }
+
+
+        /*screen-showing Section*/
+        .screen-showing {
+            padding: 100px 0;
+            background: #f8fbff;
+        }
+        .screen-showing .container_left{
+            max-width: 1000px;        /* 좌우 두 개 들어갈 크기 */
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between; /* 좌우로 배치 */
+            align-items: center;
+            gap: 2rem;
+            min-height: 100vh;       
+        }
+        .screen-showing .container_right{
+            max-width: 1000px;        /* 좌우 두 개 들어갈 크기 */
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between; /* 좌우로 배치 */
+            align-items: center;
+            gap: 2rem;
+            min-height: 100vh;       
+        }
+        .screen-mockup img {/*목업 컨테이너*/
+            width: 60%;         /* 기존 80% → 50% */
+            max-width: 150px;   /* 화면이 커도 이 이상 안 커짐 */
+            height: auto;
+            border-radius: 20px;
+        }
+    
+        .text-box { /*글씨 컨테이너*/
+            display: flex;
+            flex-direction: column; /* 세로 배치 */
+            gap: 1rem;
+            flex: 1;
+        }
+        .text-box .title{
+            font-weight: 700;
+            text-align: center;
+            font-size: 2rem;
+            color: #3380ff;
+            margin-bottom: 0.5rem;
+
+        }
+        .text-box p {
+            line-height: 1.6;
+            text-align: center;
+            color: #10395d;
+        }
+        
+        /*목업 효과와 텍스트 효과*/
+        .container_left, .container_right {
+            opacity: 0;
+            transition: 1s;
+        }
+        .container_left { transform: translateX(-30px); }
+        .container_right { transform: translateX(30px); }
+        .container_left.show, .container_right.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        /* 공통 초기 상태 */
+        .text-box {
+        opacity: 0;
+        transition: opacity 1s, transform 1s;
+        }
+
+        /* container_left 안의 텍스트는 오른쪽에서 */
+        .container_left .text-box {
+        transform: translateX(30px);
+        }
+
+        /* container_right 안의 텍스트는 왼쪽에서 */
+        .container_right .text-box {
+        transform: translateX(-30px);
+        }
+
+        /* show 클래스 붙으면 제자리 */
+        .text-box.show {
+        opacity: 1;
+        transform: translateX(0);
+        }
+
+        /*Simulation Section*/
+        .Simulation{
+            padding: 100px 0;
+            background: #eef6ff;
+            text-align: center;
+        }
+        @keyframes smoothPulse {
+            0%, 100% {
+                opacity: 1;          /* 완전 보임 */
+                transform: scale(1.05); /* 크기 변화 */
+            }
+            50% {
+                opacity: 0;      /*안 보임*/  
+                transform: scale(1); /* 크기 변화 없음 */
+            }
+        }
+        .Simulation .title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: #4A90E2;
+            animation: smoothPulse 1.8s ease-in-out infinite; /* 부드러운 깜빡임 */
+            
+        }
+
+        .Simulation .subtitle{
+            text-align: center;
+            font-size: 1.2rem;
+            color:#609ce0;
+            margin-top: 1rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .simulation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top:5rem;
+            flex-wrap: wrap;
+        }
+
+        .simulation-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem 8rem;
+            background: #ffffffa2;
+            color:  #4A90E2;
+            font-size: 1.2rem;
+    
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            justify-content: center;
+            border: 2px solid  #4A90E2; /* 흰색 테두리 */
+        }
+
+        .simulation-button:hover{
+            background:  #4A90E2;
+            color:  #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+        }
+
+        .simulationBtn-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem;
+        }
+        
+
+
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #5a6c7d;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4A90E2,#51a8ff, #95cf9a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .feature-card p {
+            color: #5a6c7d;
+            line-height: 1.6;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 100px 0;
+            background: #f8fbff;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: #4A90E2;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .step p {
+            color: #5a6c7d;
+            line-height: 1.6;
+        }
+
+
+
+        /*포인트 이미지 Section background: #4A90E2;*/
+        .pointIMG{
+            padding: 0 0;
+            background: linear-gradient(135deg, #0041b1, #bae6ff);
+            text-align: center;
+            color :#f8fbff;
+        }
+
+        .pointIMG img{
+            width: 100%;        /* 기본 크기: 부모 폭의 60% */
+            height: auto;      /* 비율 유지 */
+            display: block;
+            margin: 0 auto;   
+        }
+
+        .pointIMG .title{
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pointIMG .subtitle{
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 400;
+            padding-bottom: 5rem;
+        }
+
+        /* 타이틀, 서브타이틀 효과*/
+        .pointIMG .title,
+        .pointIMG .subtitle {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity .5s ease, transform .7s ease;
+        }
+
+        /* 보일 때 순차 등장 */
+        .pointIMG.seen .title {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: .5s;      /* 먼저 */
+        }
+        .pointIMG.seen .subtitle {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: .8s;     /* 그 다음 */
+        }
+    
+
+
+
+
+
+
+        /* App Download Section */
+        .app-download {
+            padding: 100px 0;
+            background: white;
+            text-align: center;
+        }
+
+        .download-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .download-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .download-subtitle {
+            font-size: 1.2rem;
+            color: #5a6c7d;
+            margin-bottom: 1rem;
+        }
+        /*클립 로고 css*/
+        .klip-logo {
+            width: clamp(30px, 25vw, 60px);
+            height: auto;
+            display: block;
+            margin: 1rem auto 1.5rem;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
+            transition: transform .25s ease, filter .25s ease;
+        }
+
+        .store-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .store-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background-color: rgba(10, 113, 217, 0.622); /* 0.7은 불투명도 */
+            color: #f2f7ff;
+    
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .store-button:hover {
+            background: #1a252f;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+        }
+
+        .store-button img {
+            width: 25px; /* 로고 크기 */
+            height: auto;
+            display: block;
+        }
+
+        .store-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem;
+        }
+
+        .store-text small {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .store-text span {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        
+        /* Footer */
+        footer {
+            background: #eef6ff;
+            padding: 60px 0 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-brand .logo {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-brand p {
+            color: #5a6c7d;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #4A90E2;
+        }
+
+        .footer-section a {
+            color: #5a6c7d;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #4A90E2;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-bottom p {
+            color: #4A90E2;
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #4A90E2;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .phone-mockup {
+                width: 250px;
+                height: 500px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+            }
+
+            .store-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Smooth animations */
+        .fade-in { opacity: 0; transform: translateY(16px); transition: .8s; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+
+
+        /* Loading animation for phone mockup */
+        .phone-screen::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <!--<div class="logo-icon">K</div>-->
+                <img class="logo_respon" src="../images/KhealthticketLogo.png" alt="로고 이미지"> 
+                K-Health Ticket
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="./index.html">홈</a></li>
+                    <li><a href="#Simulation">시뮬레이션</a></li>
+                    <li><a href="#features">서비스</a></li>
+                    <li><a href="#how-it-works">이용방법</a></li>
+                    <li><a href="#download">다운로드</a></li>
+                    <li><a href="#contact">문의</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>
+                    <span class="highlight">NFT 진단서로</span><br>
+                    의료데이터 주권을 갖는<br>
+                    첫걸음
+                </h1>
+                <p>블록체인 기술로 안전하게 보관되는 진단서를 약국과 공항에서 간편하게 사용하세요. 의료 서비스의 디지털 혁신을 경험해보세요.</p>
+                <div class="cta-buttons">
+                    <a href="#download" class="btn-primary">
+                        무료 다운로드
+                        <span>→</span>
+                    </a>
+                    <a href="#features" class="btn-secondary">서비스 알아보기</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-content">
+                            <img src="../images/KhealthticketLogo.png" alt="목업 로고">
+                            <h3>K-Health Ticket</h3>
+                            <p>블록체인으로 보호되는<br>나만의 디지털 진단서</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- why K-Health Ticket Section-->
+    <section class="why-KHT" id="why-KHT">
+        <div class="container">
+            <div class="section-title">
+            "진료는 내 몸이 하는데, 기록은 병원만 갖습니다.<br>
+             당신의 진료 정보, 진짜 주인은 누구인가요?"<br>
+            </div>
+            <div class="section-subtitle">
+             의료정보는 내 몸의 이야기지만  그 소유권은 아직 나에게 있지 않습니다.<br>
+             <span class="highlight">K-Health ticket</span>은 환자가 처방전과 의료데이터를 직접 보관하고<br>
+             활용할 수 있도록 돕는 <span class="highlight">새로운 헬스케어</span> 연결 방식입니다.
+            </div>
+        
+        </div>
+
+    </section>
+
+
+    <!--screen showing Section-->
+    <section class="screen-showing" id="screen-showing">
+        <div class="container_left">
+            <img class="screen-mockup" src="../images/Screen2.png" alt="로고 이미지"> 
+            <div class="text-box">
+                <h3 class="title">온라인 증빙 기능</h3>
+                <p>
+                    NFT 진료 확인서를 통해<br>
+                    병원 방문 없이도 간편하게 진료 사실을<br>
+                    제출하고 검증할 수 있도록 지원합니다.<br>
+                    공공기관, 보험사 등 다양한 곳에 빠르고 정확한 증빙이 가능합니다.
+                </p>
+            </div>
+        </div>
+         <div class="container_right">
+            <div class="text-box">
+                <h3 class="title">NFT 진단서</h3>
+                <p>
+                    블록체인 기반으로 위·변조가 불가능한<br>
+                    디지털 진료 증명서를 발급하는 기능입니다.<br>
+                    언제 어디서나 안전하게 진위를 검증할 수 있어<br>
+                    신뢰성과 편의성을 동시에 제공합니다.
+                </p>
+            </div>
+
+            <img class="screen-mockup" src="../images/Screen1.png" alt="로고 이미지"> 
+        </div>
+    </section>
+
+
+    <!-- Simulation Section -->
+    <section class="Simulation" id="Simulation">
+        <div class="title">K-Health Ticket 유저 시뮬레이션을 체험해보세요!</div>
+        <div class="subtitle">
+            약국과 공항에서 사용되는 서비스를 직접 체험해 볼 수 있습니다.
+        </div>
+
+        <div class="simulation-buttons">
+            <a href="./website/pharmacyservice.html" class="simulation-button">
+                <div class="simulationBtn-text">
+                    <span>약국 바로가기</span>
+                </div>
+            </a>
+            <a href="./website/airportservice.html" class="simulation-button">
+                <div class="simulationBtn-text">
+                    <span>공항 바로가기</span>
+                </div>
+            </a>
+            </div>
+    </section>
+
+
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">왜 K-Health Ticket인가요?</h2>
+            <p class="section-subtitle">블록체인 기술과 NFT를 활용한 혁신적인 디지털 의료 서비스로 더욱 안전하고 편리한 경험을 제공합니다.</p>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔐</div>
+                    <h3>블록체인 보안</h3>
+                    <p>분산 원장 기술로 진단서의 위변조를 원천 차단하고, 개인정보를 안전하게 보호합니다.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🏆</div>
+                    <h3>NFT 소유권 보장</h3>
+                    <p>고유한 NFT로 발급된 진단서는 개인만의 디지털 자산으로 완전한 소유권을 보장받습니다.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">💊</div>
+                    <h3>약국 즉시 인증</h3>
+                    <p>전국 제휴 약국에서 NFC 스캔만으로 빠르고 정확한 처방전 확인이 가능합니다.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">✈️</div>
+                    <h3>공항 건강 증명</h3>
+                    <p>해외 출입국 시 필요한 건강 증명서로 활용하여 원활한 절차를 돕습니다.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🏥</div>
+                    <h3>병원 즉시 발급</h3>
+                    <p>병원에서 직속으로 발급하며 키오스크나 추가 절차가 필요없습니다.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📱</div>
+                    <h3>직관적인 사용성</h3>
+                    <p>복잡한 기술은 숨기고, 누구나 쉽게 사용할 수 있는 직관적인 인터페이스를 제공합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">간단한 4단계로 시작하세요</h2>
+            <p class="section-subtitle">복잡한 절차 없이 누구나 쉽게 디지털 진단서를 발급받고 활용할 수 있습니다.</p>
+            <div class="steps-container">
+                <div class="step fade-in">
+                    <div class="step-number">1</div>
+                    <h3>병원 방문 및 진료</h3>
+                    <p>제휴 의료진으로부터 진료를 받고 디지털 진단서 발급을 요청하세요.</p>
+                </div>
+                <div class="step fade-in">
+                    <div class="step-number">2</div>
+                    <h3>Klip 지갑에서 요청키 확인</h3>
+                    <p>Klip 지갑에서 NFT 의료 서비스를 확인하세요.</p>
+                </div>
+                <div class="step fade-in">
+                    <div class="step-number">3</div>
+                    <h3>NFT 진단서 발급</h3>
+                    <p>NFC 승인 후 블록체인에 안전하게 저장된 NFT 진단서가 자동 발급됩니다.</p>
+                </div>
+                <div class="step fade-in">
+                    <div class="step-number">4</div>
+                    <h3>필요한 곳에서 활용</h3>
+                    <p>약국, 공항 등에서 NFC 스캔으로 간편하고 빠르게 인증받으세요.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--신뢰-->
+    <section class="pointIMG" id="pointIMg">
+        <img src="../images/Doctor.png" alt="포인트 이미지">
+        <div class="title">의사, 환자, 약사의 신뢰를 연결합니다.</div>
+        <div class="subtitle">
+            블록체인 기술이 의료 진단서를 세상에서 가장 안전한 디지털 티켓으로 만듭니다.<br>
+            이제, 위변조 걱정 없이 투명하고 편리한 의료 경험의 새로운 표준을 만나보세요.
+        </div>
+    </section>
+
+    <!-- App Download Section -->
+    <section class="app-download" id="download">
+        <div class="download-content">
+            <h2 class="download-title">지금 Klip앱에서 바로 시작하세요</h2>
+            <p class="download-subtitle">K-Health Ticket으로 더 스마트하고 안전한 의료 서비스를 경험해보세요</p>
+            <img src="../images/KlipLogo.png" class="klip-logo">
+            <div class="store-buttons">
+                <a href="#" class="store-button">
+                    <img src="../images/applestore.png" alt="Apple Logo">
+                    <div class="store-text">
+                        <small>Download on the</small>
+                        <span>App Store</span>
+                    </div>
+                </a>
+                <a href="#" class="store-button">
+                    <img src="../images/playstore.png" alt="Google Logo">
+                    <div class="store-text">
+                        <small>GET IT ON</small>
+                        <span>Google Play</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        K-Health Ticket
+                    </div>
+                    <p>블록체인 기반 디지털 의료 서비스의 선도 기업으로서, 안전하고 혁신적인 의료 솔루션을 제공합니다.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>서비스</h4>
+                    <a href="#">어플리케이션 서비스</a>
+                    <a href="#">약국 연동 서비스</a>
+                    <a href="#">공항 인증 서비스</a>
+                    <a href="#">병원 포털 서비스</a>
+                </div>
+                <div class="footer-section">
+                    <h4>지원</h4>
+                    <a href="#">고객센터</a>
+                    <a href="#">자주 묻는 질문</a>
+                    <a href="#">사용 가이드</a>
+                    <a href="#">개발자 API</a>
+                </div>
+                <div class="footer-section">
+                    <h4>회사</h4>
+                    <a href="#">회사 소개</a>
+                    <a href="#">팀 소개</a>
+                    <a href="#">채용 정보</a>
+                    <a href="#">언론 보도</a>
+                </div>
+                <div class="footer-section">
+                    <h4>문의</h4>
+                    <a href="mailto:support@khealth-ticket.com">support@khealth-ticket.com</a>
+                    <a href="tel:1588-1234">1588-1234</a>
+                    <a href="#">경기도 성남시 판교역로 220</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 K-Health Ticket. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">개인정보처리방침</a>
+                    <a href="#">이용약관</a>
+                    <a href="#">쿠키 정책</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            entry.target.classList.toggle('visible', entry.isIntersecting);
+        });
+        }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+        // Header scroll effect
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.boxShadow = 'none';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+
+        // why-KHT 대제목 효과
+        document.addEventListener("DOMContentLoaded", () => {
+        const el = document.querySelector(".why-KHT .section-title");
+        if (!el) return;
+
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                // 화면에 (절반 이상) 들어오면 등장 효과 실행
+                entry.target.classList.add("show");
+                }else {
+                // 화면에서 벗어나면 초기화 → 다음에 다시 들어올 때 또 재생
+                entry.target.classList.remove("show");
+                }
+            });
+        }, { threshold: 0.5 });
+
+        io.observe(el);
+        });
+
+
+        //목업과 텍스트 효과
+        const ioLR = new IntersectionObserver((entries)=>{
+        entries.forEach(v=>{
+            v.target.classList.toggle('show', v.isIntersecting);
+        });
+        },{ threshold: 0.25 });
+
+        document.querySelectorAll('.container_left, .container_right')
+        .forEach(el => ioLR.observe(el));
+
+        const ioText = new IntersectionObserver(entries=>{
+        entries.forEach(v=>{
+            v.target.classList.toggle('show', v.isIntersecting);
+        });
+        },{threshold:0.2});
+
+        document.querySelectorAll('.text-box').forEach(el=>ioText.observe(el));
+
+
+
+        //포인트 이미지 섹션 텍스트 효과
+        const sec = document.querySelector('.pointIMG');
+        const ioPoint = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+            sec.classList.toggle('seen', e.isIntersecting);
+        });
+        },{ threshold: 0.2 });
+
+        ioPoint.observe(sec);
+
+
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.13/html-to-image.min.js" integrity="sha512-iZ2ORl595Wx6miw+GuadDet4WQbdSWS3JLMoNfY8cRGoEFy6oT3G9IbcrBeL6AfkgpA51ETt/faX6yLV+/gFJg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      (function() {
+        const originalConsole = window.console;
+        window.console = {
+          log: (...args) => {
+            originalConsole.log(...args);
+            window.parent.postMessage({ type: 'console', message: args.join(' ') }, '*');
+          },
+          error: (...args) => {
+            originalConsole.error(...args);
+            window.parent.postMessage({ type: 'console', message: 'Error: ' + args.join(' ') }, '*');
+          },
+          warn: (...args) => {
+            originalConsole.warn(...args);
+            window.parent.postMessage({ type: 'console', message: 'Warning: ' + args.join(' ') }, '*');
+          }
+        };
+
+        let requestId = 0;
+        let callbacksMap = new Map();
+        let streamControllers = new Map();
+        
+        window.claude = {
+          complete: (prompt) => {
+            return new Promise((resolve, reject) => {
+              const id = requestId++;
+              callbacksMap.set(id, { resolve, reject });
+              window.parent.postMessage({ type: 'claudeComplete', id, prompt }, '*');
+            });
+          }
+        };
+
+        let pendingBlobs = new Map();
+        URL.createObjectURL = (blob) => {
+          const blobId = `blob-${Date.now()}-${Math.random()}`;
+          pendingBlobs.set(blobId, blob);
+          return `blob-request://${blobId}`;
+        };
+
+        URL.revokeObjectURL = (url) => {
+          const blobId = url.replace("blob-request://", "");
+          pendingBlobs.delete(blobId);
+        };
+
+        const getBlobFromURL = (url) => {
+          const blobId = url.replace("blob-request://", "");
+          return pendingBlobs.get(blobId);
+        };
+
+        // Override global fetch with streaming support
+        window.fetch = (url, init = {}) => {
+          return new Promise((resolve, reject) => {
+            const id = requestId++;
+            const channelId = `fetch-${id}-${Date.now()}`;
+            
+            callbacksMap.set(id, { 
+              resolve: (response) => {
+                const stream = new ReadableStream({
+                  start(controller) {
+                    streamControllers.set(channelId, controller);
+                  },
+                  cancel() {
+                    streamControllers.delete(channelId);
+                  }
+                });
+                
+                resolve(new Response(stream, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers
+                }));
+              },
+              reject,
+              channelId
+            });
+            
+            window.parent.postMessage({
+              type: 'proxyFetch',
+              id,
+              url,
+              init,
+              channelId
+            }, '*');
+          });
+        };
+
+        window.addEventListener('message', async (event) => {
+          if (event.data.type === 'takeScreenshot') {
+            const rootElement = document.getElementById('artifacts-component-root-html');
+            if (!rootElement) {
+              window.parent.postMessage({
+                type: 'screenshotError',
+                error: new Error('Root element not found'),
+              }, '*');
+            }
+            const screenshot = await htmlToImage.toPng(rootElement, {
+              imagePlaceholder:
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjePDgwX8ACOQDoNsk0PMAAAAASUVORK5CYII=",
+            });
+            window.parent.postMessage({
+              type: 'screenshotData',
+              data: screenshot,
+            }, '*');
+          } else if (event.data.type === 'claudeComplete') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+            } else {
+              callback.resolve(event.data.completion);
+            }
+            callbacksMap.delete(event.data.id);
+          } else if (event.data.type === 'proxyFetchResponse') {
+            const callback = callbacksMap.get(event.data.id);
+            if (event.data.error) {
+              callback.reject(new Error(event.data.error));
+              callbacksMap.delete(event.data.id);
+            } else {
+              callback.resolve({
+                status: event.data.status,
+                statusText: event.data.statusText,
+                headers: event.data.headers
+              });
+              if (!event.data.body) {
+                callbacksMap.delete(event.data.id);
+              }
+            }
+          } else if (event.data.type === 'proxyFetchStream') {
+            const controller = streamControllers.get(event.data.channelId);
+            if (controller) {
+              if (event.data.error) {
+                controller.error(new Error(event.data.error));
+                streamControllers.delete(event.data.channelId);
+              } else if (event.data.done) {
+                controller.close();
+                streamControllers.delete(event.data.channelId);
+                const callback = Array.from(callbacksMap.entries()).find(
+                  ([_, value]) => value.channelId === event.data.channelId
+                );
+                if (callback) {
+                  callbacksMap.delete(callback[0]);
+                }
+              } else if (event.data.chunk) {
+                controller.enqueue(new Uint8Array(event.data.chunk));
+              }
+            }
+          }
+        });
+
+        window.addEventListener('click', (event) => {
+          const isEl = event.target instanceof HTMLElement;
+          if (!isEl) return;
+    
+          const linkEl = event.target.closest("a");
+          if (!linkEl || !linkEl.href) return;
+    
+          event.preventDefault();
+          event.stopImmediatePropagation();
+    
+          if (linkEl.href.startsWith("blob-request:")) {
+            const blob = getBlobFromURL(linkEl.href);
+            if (!blob) return;
+            void blob.arrayBuffer().then((data) => {
+              window.parent.postMessage({
+                type: "downloadFile",
+                filename: linkEl.download,
+                data,
+                mimeType: blob.type || "application/octet-stream",
+              });
+            });
+          } else if (linkEl.href.startsWith("data:")) {
+            const [header, base64Data] = linkEl.href.split(",");
+            const mimeMatch = header.match(/data:([^;]+)/);
+            const mimeType = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+            const binaryString = atob(base64Data);
+            const data = Uint8Array.from(binaryString, (c) =>
+              c.charCodeAt(0),
+            ).buffer;
+            window.parent.postMessage({
+              type: "downloadFile",
+              filename: linkEl.download,
+              data,
+              mimeType,
+            });
+          } else {
+            let linkUrl;
+            try {
+              linkUrl = new URL(linkEl.href);
+            } catch (error) {
+              return;
+            }
+    
+            if (linkUrl.hostname === window.location.hostname) return;
+      
+            window.parent.postMessage({
+              type: 'openExternal',
+              href: linkEl.href,
+            }, '*');
+          }
+      });
+
+        const originalOpen = window.open;
+        window.open = function (url) {
+          window.parent.postMessage({
+            type: "openExternal",
+            href: url,
+          }, "*");
+        };
+
+        window.addEventListener('error', (event) => {
+          window.parent.postMessage({ type: 'console', message: 'Uncaught Error: ' + event.message }, '*');
+        });
+      })();
+    </script>
+  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>약국용 처방전 검증 시스템</title>
+    <style>
+        :root {
+            /* 고정 폭 규격: min(55vw, 1200px) */
+            --app-width: 1200px;
+            --content-padding-x: 24px;
+            --content-padding-y: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start; /* 상단 정렬 */
+            justify-content: center; /* 수평 중앙 */
+            color: #333;
+            background: #ffffff; /* 기존 스타일 유지 */
+        }
+        
+        .container {
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            overflow: hidden;
+            width: var(--app-width); /* ← 고정 폭 규격 적용 */
+            min-height: auto; /* 내용에 따라 자동 확장 */
+            border-radius: 16px; /* 공항 규격과 유사한 라운딩, 기존 톤 유지 */
+                  
+            background: var(--surface);
+
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p { opacity: 0.9; font-size: 16px; }
+        
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* 세로 위쪽 정렬로 변경 */
+            min-height: 500px;
+        }
+
+        .initial-screen {
+            text-align: center;
+            margin-top: 40px; /* 원하는 만큼 위쪽 여백 조절 */
+        }
+        
+        .prescription-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 25px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        .prescription-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(39, 174, 96, 0.4);
+        }
+        
+        .prescription-btn:active { transform: translateY(-1px); }
+        
+        .info-text { color: #7f8c8d; font-size: 18px; line-height: 1.6; }
+        
+        /* QR/NFC 선택 화면 */
+        .selection-screen { display: none; text-align: center; width: 100%; }
+        
+        .selection-title {
+            font-size: 28px; color: #2c3e50; margin-bottom: 40px; font-weight: 300;
+        }
+        
+        .selection-buttons {
+            display: flex; gap: 40px; justify-content: center; margin-bottom: 40px;
+        }
+        
+        .method-btn {
+            background: white;
+            border: 3px solid #3498db;
+            padding: 40px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 200px;
+            text-align: center;
+        }
+        
+        .method-btn:hover {
+            background: #3498db; color: white; transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3);
+        }
+        
+        .method-icon { font-size: 60px; margin-bottom: 20px; }
+        .method-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+        .method-desc { font-size: 14px; opacity: 0.8; }
+        
+        /* NFC 인증 화면 */
+        .nfc-screen { display: none; text-align: center; width: 100%; }
+        
+        .nfc-animation {
+            width: 150px; height: 150px; margin: 0 auto 30px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 60px; color: white; animation: pulse 2s infinite;
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.5);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 30px rgba(231, 76, 60, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 50px rgba(231, 76, 60, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 30px rgba(231, 76, 60, 0.5); }
+        }
+        
+        .nfc-status { font-size: 24px; color: #2c3e50; margin-bottom: 20px; font-weight: 300; }
+        .nfc-instruction { font-size: 16px; color: #7f8c8d; margin-bottom: 30px; line-height: 1.6; }
+        
+        /* 처방전 목록 화면 */
+        .prescription-list-screen { display: none; width: 100%; }
+        
+        .success-header { text-align: center; margin-bottom: 40px; }
+        
+        .success-icon {
+            width: 80px; height: 80px; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 40px; color: white; margin: 0 auto 20px; animation: checkmark 0.6s ease-in-out;
+        }
+        
+        @keyframes checkmark { 0% { transform: scale(0);} 50% { transform: scale(1.2);} 100% { transform: scale(1);} }
+        
+        .patient-info { background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 30px; border-left: 5px solid #3498db; }
+        
+        .patient-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        .patient-field { display: flex; justify-content: space-between; }
+        
+        .patient-label { font-weight: bold; color: #2c3e50; }
+        .patient-value { color: #7f8c8d; }
+        
+        .prescription-items { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .prescription-header { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); color: white; padding: 20px 25px; font-size: 20px; font-weight: bold; }
+        
+        .prescription-item { padding: 20px 25px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease; }
+        .prescription-item:hover { background-color: #f8f9fa; }
+        .prescription-item:last-child { border-bottom: none; }
+        
+        .medication-info { flex: 1; }
+        .medication-name { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+        .medication-details { font-size: 14px; color: #7f8c8d; }
+        
+        .medication-quantity { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; min-width: 80px; text-align: center; }
+        
+        /* 버튼들 */
+        .action-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        
+        .btn { padding: 15px 30px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        
+        .btn-back { background: #95a5a6; color: white; }
+        .btn-back:hover { background: #7f8c8d; transform: translateY(-2px); }
+        
+        .btn-process { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; }
+        .btn-process:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3); }
+        
+        .btn-new { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; }
+        .btn-new:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3); }
+        
+        /* 반응형 (기존 유지) */
+        @media (max-width: 768px) {
+            .selection-buttons { flex-direction: column; align-items: center; gap: 20px; }
+            .method-btn { width: 280px; }
+            .patient-details { grid-template-columns: 1fr; }
+            .prescription-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .action-buttons { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; }
+        }
+        
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-left: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body id="artifacts-component-root-html">
+    <div class="container">
+        <div class="header">
+            <h1>💊 K-Health Ticket <p>Pharmacy system</p> </h1>
+            <p> </p>
+            <p>안전하고 정확한 처방전 검증을 위한 디지털 솔루션</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- 초기 화면 -->
+            <div class="initial-screen" id="initialScreen">
+                <button class="prescription-btn" id="prescriptionBtn">📋 처방전 접수</button>
+                <div class="info-text">
+                    <p>환자의 처방전을 안전하게 접수하고 검증합니다</p>
+                    <p>QR코드 또는 NFC를 통한 간편한 인증을 지원합니다</p>
+                </div>
+            </div>
+            
+            <!-- QR/NFC 선택 화면 -->
+            <div class="selection-screen" id="selectionScreen">
+                <h2 class="selection-title">인증 방법을 선택해주세요</h2>
+                <div class="selection-buttons">
+                    <div class="method-btn" id="qrBtn">
+                        <div class="method-icon">📱</div>
+                        <div class="method-title">QR 코드</div>
+                        <div class="method-desc">카메라로 QR코드를 스캔하여 인증</div>
+                    </div>
+                    <div class="method-btn" id="nfcBtn">
+                        <div class="method-icon">📡</div>
+                        <div class="method-title">NFC 인증</div>
+                        <div class="method-desc">NFC 태그를 터치하여 인증</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-back" id="backToInitial">← 뒤로가기</button>
+                </div>
+            </div>
+            
+            <!-- NFC 인증 화면 -->
+            <div class="nfc-screen" id="nfcScreen">
+                <div class="nfc-animation">📡</div>
+                <div class="nfc-status" id="nfcStatus">NFC 인증 대기 중...</div>
+                <div class="nfc-instruction">처방전이 포함된 NFC 카드나 기기를<br>리더기에 가까이 대어주세요</div>
+                <div class="action-buttons">
+                    <button class="btn btn-back" id="backToSelection">← 뒤로가기</button>
+                    <button class="btn btn-process" id="simulateNfc">인증</button>
+                </div>
+            </div>
+            
+            <!-- 처방전 목록 화면 -->
+            <div class="prescription-list-screen" id="prescriptionListScreen">
+                <div class="success-header">
+                    <div class="success-icon">✓</div>
+                    <h2>처방전 인증 완료</h2>
+                </div>
+                
+                <div class="patient-info">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">환자 정보</h3>
+                    <div class="patient-details">
+                        <div class="patient-field"><span class="patient-label">환자명:</span><span class="patient-value" id="patientName">김환자</span></div>
+                        <div class="patient-field"><span class="patient-label">생년월일:</span><span class="patient-value" id="patientBirth">1985.03.15</span></div>
+                        <div class="patient-field"><span class="patient-label">처방 병원:</span><span class="patient-value" id="hospitalName">서울대학교병원</span></div>
+                        <div class="patient-field"><span class="patient-label">의사명:</span><span class="patient-value" id="doctorName">김진성</span></div>
+                        <div class="patient-field"><span class="patient-label">처방일:</span><span class="patient-value" id="prescriptionDate">2025.08.06</span></div>
+                        <div class="patient-field"><span class="patient-label">처방전 번호:</span><span class="patient-value" id="prescriptionId">RX-20250806-001</span></div>
+                    </div>
+                </div>
+                
+                <div class="prescription-items">
+                    <div class="prescription-header">💊 처방 의약품 목록</div>
+                    <div id="medicationList"><!-- 동적 추가 --></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-new" id="newPrescription">새 처방전 접수</button>
+                    <button class="btn btn-process" id="processDispensing">조제 진행</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 화면 전환
+        function showScreen(screenId) {
+            const screens = ['initialScreen', 'selectionScreen', 'nfcScreen', 'prescriptionListScreen'];
+            screens.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+            const target = document.getElementById(screenId);
+            if (target) target.style.display = 'block';
+        }
+
+        // 샘플 처방전 데이터
+        const samplePrescriptions = [
+            {
+                patientName: '김환자',
+                patientBirth: '1985.03.15',
+                hospitalName: '서울대학교병원',
+                doctorName: '김진성',
+                prescriptionDate: '2025.08.06',
+                prescriptionId: 'RX-20250806-001',
+                medications: [
+                    { name: '아모시실린 250mg', details: '1일 3회, 식후 30분, 7일분', quantity: '21정' },
+                    { name: '타이레놀 500mg', details: '1일 3회, 필요시, 5일분', quantity: '15정' },
+                    { name: '오메프라졸 20mg', details: '1일 1회, 공복시, 14일분', quantity: '14캡슐' },
+                    { name: '로라타딘 10mg', details: '1일 1회, 취침전, 7일분', quantity: '7정' }
+                ]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('prescriptionBtn').addEventListener('click', () => showScreen('selectionScreen'));
+            document.getElementById('qrBtn').addEventListener('click', function() {
+                alert('QR 스캔 기능은 실제 구현시 카메라 API를 사용합니다.\n현재는 시뮬레이션 모드입니다.');
+                setTimeout(() => { loadPrescriptionData(samplePrescriptions[0]); showScreen('prescriptionListScreen'); }, 1500);
+            });
+            document.getElementById('nfcBtn').addEventListener('click', function() { showScreen('nfcScreen'); startNfcAnimation(); });
+            document.getElementById('simulateNfc').addEventListener('click', simulateNfcAuthentication);
+            document.getElementById('backToInitial').addEventListener('click', () => showScreen('initialScreen'));
+            document.getElementById('backToSelection').addEventListener('click', () => showScreen('selectionScreen'));
+            document.getElementById('newPrescription').addEventListener('click', () => showScreen('initialScreen'));
+            document.getElementById('processDispensing').addEventListener('click', function() {
+                 const proceed = confirm('조제가 진행됩니다.\n환자에게 대기번호를 안내해주세요.\n');
+            });
+        });
+
+        function startNfcAnimation() {
+            const nfcStatus = document.getElementById('nfcStatus');
+            nfcStatus.innerHTML = 'NFC 리더기 준비 중<span class="loading"></span>';
+            setTimeout(() => { nfcStatus.textContent = 'NFC 인증 대기 중...'; }, 2000);
+        }
+
+        function simulateNfcAuthentication() {
+            const nfcStatus = document.getElementById('nfcStatus');
+            const simulateBtn = document.getElementById('simulateNfc');
+            simulateBtn.textContent = '인증 중...';
+            simulateBtn.disabled = true;
+            nfcStatus.innerHTML = 'NFC 태그 감지됨<span class="loading"></span>';
+            setTimeout(() => { nfcStatus.textContent = '인증 정보 확인 중...'; }, 1000);
+            setTimeout(() => { nfcStatus.textContent = '처방전 데이터 로딩 중...'; }, 2000);
+            setTimeout(() => {
+                loadPrescriptionData(samplePrescriptions[0]);
+                showScreen('prescriptionListScreen');
+                simulateBtn.textContent = 'NFC 인증';
+                simulateBtn.disabled = false;
+            }, 3000);
+        }
+
+        function loadPrescriptionData(prescription) {
+            document.getElementById('patientName').textContent = prescription.patientName;
+            document.getElementById('patientBirth').textContent = prescription.patientBirth;
+            document.getElementById('hospitalName').textContent = prescription.hospitalName;
+            document.getElementById('doctorName').textContent = prescription.doctorName;
+            document.getElementById('prescriptionDate').textContent = prescription.prescriptionDate;
+            document.getElementById('prescriptionId').textContent = prescription.prescriptionId;
+
+            const medicationList = document.getElementById('medicationList');
+            medicationList.innerHTML = '';
+            prescription.medications.forEach(medication => {
+                const medicationItem = document.createElement('div');
+                medicationItem.className = 'prescription-item';
+                medicationItem.innerHTML = `
+                    <div class="medication-info">
+                        <div class="medication-name">${medication.name}</div>
+                        <div class="medication-details">${medication.details}</div>
+                    </div>
+                    <div class="medication-quantity">${medication.quantity}</div>
+                `;
+                medicationList.appendChild(medicationItem);
+            });
+        }
+    </script>
+</body>
+</html>
