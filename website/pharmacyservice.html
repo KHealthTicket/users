@@ -2,7 +2,8 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- 모바일에서도 데스크톱 폭(1200px)으로 고정 -->
+        <meta name="viewport" content="width=1200">
         <title>K-Health Ticket - 블록체인 기반 디지털 진단서</title>
         <style>
             * {
@@ -11,11 +12,15 @@
                 box-sizing: border-box;
             }
 
+            html, body {
+                min-width: 1200px; /* 데스크톱 레이아웃 유지 */
+            }
+
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                 line-height: 1.6;
                 color: #2c3e50;
-                overflow-x: hidden;
+                overflow-x: auto; /* 모바일에서 내용 잘리지 않도록 */
             }
 
             /* Header */
@@ -47,7 +52,7 @@
                 display: flex;
                 align-items: center;
                 gap: 1rem;
-            /* 애니메이션 초기 상태 */
+                /* 애니메이션 초기 상태 */
                 opacity: 0;
                 transform: scale(0.8);
                 animation: logoIntro 0.8s ease-out forwards;
@@ -67,20 +72,17 @@
             
             /* 이미지 로고 전용 스타일 */
             .logo_respon {
-            max-width: 35px;
-            height: auto;
-            display: block;
-            filter: drop-shadow(0 4px 6px rgba(66, 188, 147, 0.3));
-
-            /* 애니메이션 초기 상태 */
-            animation: pulseLogo 2s ease-in-out infinite;
+                max-width: 35px;
+                height: auto;
+                display: block;
+                filter: drop-shadow(0 4px 6px rgba(66, 188, 147, 0.3));
+                animation: pulseLogo 2s ease-in-out infinite;
             }
 
-            /* 로고 구간 전체 애니메이션 설정 */
             @keyframes pulseLogo {
-            0%   { transform: scale(1); }
-            50%  { transform: scale(1.10); }
-            100% { transform: scale(1); }
+                0%   { transform: scale(1); }
+                50%  { transform: scale(1.10); }
+                100% { transform: scale(1); }
             }
 
             nav ul {
@@ -103,14 +105,9 @@
                 background: rgba(74, 144, 226, 0.1);
             }
 
-
-        
-
-
-            /*Hello section*/
+            /* Hello section */
             .Hello{
                 background: linear-gradient(135deg, #016bb2 0%, #78c4f7 100%);
-                        
                 padding: 120px 0 80px;
                 min-height: 80vh;
                 display: flex;
@@ -156,10 +153,10 @@
             }
 
             .logo-airport {
-                max-width: 80%;  /* 반응형 */
+                max-width: 80%;
                 height: auto;
                 display: block;
-                margin: 0 0rem;   /* 이미지 가운데 정렬 */
+                margin: 0 0rem;
                 opacity: 0;
                 transition: opacity 0.8s ease;
             }
@@ -168,25 +165,12 @@
                 animation: fadePulse 2.5s ease-in-out infinite;
             }
 
-            /* fade-out → fade-in 반복 */
             @keyframes fadePulse {
-                0%, 100% {
-                    opacity: 0.3; /* 시작과 끝은 흐리게 */
-                }
-                50% {
-                    opacity: 1;   /* 중간에 선명하게 */
-                }
+                0%, 100% { opacity: 0.3; }
+                50%      { opacity: 1;   }
             }
 
-
-        
-
-
-
-
-
-            /*AirportSim Section*/
-
+            /* AirportSim Section */
             .AirportSim {
                 background: #ffffff;
                 position: relative;
@@ -203,7 +187,7 @@
                 color: #2c3e50;
                 
                 opacity: 0;
-                transform: translateY(40px); /* 아래에서 올라오는 효과 */
+                transform: translateY(40px);
                 transition: opacity 0.8s ease, transform 0.8s ease;
             }
             .AirportSim .title.show {
@@ -215,11 +199,10 @@
                 color: #329ae0;
             }
 
-
             .nft-flow {
                 display: grid;
-                grid-auto-flow: column;                 /* step → arrow → step → arrow 순서 유지 */
-                grid-auto-columns: 1fr min-content;     /* step은 1fr(유연), arrow는 내용 크기만 */
+                grid-auto-flow: column;
+                grid-auto-columns: 1fr min-content;
                 align-items: center;
                 gap: 28px;
                 padding: 14px;
@@ -232,15 +215,9 @@
                 transition: transform 0.8s ease;
             }
 
-            .nft-flow.animate > * {
-                transform: translateX(50px); /* 오른쪽으로 이동 */
-            }
+            .nft-flow.animate > * { transform: translateX(50px); }
+            .nft-flow.animate-back > * { transform: translateX(0); }
 
-            .nft-flow.animate-back > * {
-                transform: translateX(0); /* 원위치 */
-            }
-
-            /* 고정/숨김 상태 */
             .nft-flow.is-fixed {
                 position: fixed;
                 top: var(--flowTop, 0px);
@@ -250,9 +227,7 @@
                 border-radius: 0;
             }
 
-            .nft-flow.is-hidden {
-                display: none;
-            }
+            .nft-flow.is-hidden { display: none; }
 
             .nft-flow .step {
                 display: flex;
@@ -283,24 +258,21 @@
                 user-select: none;
             }
 
-
-            /*simulation section*/
-        
+            /* simulation section */
             .simulation {
                 padding: 50px 0;
                 background: linear-gradient(135deg, #016bb2 0%, #78c4f7 100%);
                 display: flex;               
                 justify-content: center;     
-                align-items: center;         
+                align-items: center; 
+                gap: 24px;        
             }
 
-            /* 데스크탑 카드: 중앙 정렬 */
             .desktop {
                 width: min(60vw, 1200px); 
                 aspect-ratio: 16 / 10;
                 min-height: 360px;
                 height: auto;
-                /* 중앙 정렬을 막던 우측 마진 제거 */
                 margin: 0;                   
                 border-radius: 20px;
                 box-shadow: 0 20px 60px rgba(0,0,0,0.2);
@@ -309,36 +281,30 @@
                 position: relative;
             }
 
-            /* App window: 부모 안쪽으로 딱 맞게 */
             .window {
-            position: absolute;
-            inset: 16px;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 18px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
-            backdrop-filter: blur(6px) saturate(120%);
-            background: #fff;              /* 실제 앱 배경은 흰색으로 */
-            display: flex;                 /* 자식 크기 계산 위해 flex */
-            min-width: 0;                  /* overflow 관련 안전장치 */
-            min-height: 0;
-            overflow: hidden;              /* 프레임 밖으로 안 튀게 */
-            user-select: auto;             /* 텍스트 선택 가능하게 */
+                position: absolute;
+                inset: 16px;
+                border: 1px solid rgba(255,255,255,0.12);
+                border-radius: 18px;
+                box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+                backdrop-filter: blur(6px) saturate(120%);
+                background: #fff;
+                display: flex;
+                min-width: 0;
+                min-height: 0;
+                overflow: hidden;
+                user-select: auto;
             }
 
-            /* iframe이 윈도우를 100% 채우도록 */
             .site-embed {
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: block;                /* inline 기본 여백 제거 */
-            background: #fff;
+                width: 100%;
+                height: 100%;
+                border: 0;
+                display: block;
+                background: #fff;
             }
 
-            /* 모바일: 폭만 줄이면 비율대로 높이 자동 */
-            @media (max-width: 640px) {
-            .desktop { width: 94vw; }
-            .window  { inset: 12px; }
-            }
+            /* 반응형 해제: 모바일용 @media 제거 */
 
             .nfc {
                 width: 350px;       
@@ -348,6 +314,7 @@
                 position: relative;
                 overflow: hidden;
                 flex: 0 0 auto; 
+                background: #ffffff;
             }
 
             .nfc img {
@@ -359,9 +326,7 @@
                 background:linear-gradient(135deg,#8bd1ffa0,#b8e3ffcb);/* 닿았을 때 색상 */
             }
 
-
-
-            /*lastment Section*/
+            /* lastment Section */
             .lastment{
                 padding: 100px 0;
                 background: #ffffff;
@@ -385,25 +350,15 @@
             }
 
             .lastment .highlight{
-                    color: #329ae0;
-                    display: inline-block; /* transform 적용 위해 inline-block 필요 */
-                    animation: pulseText 2s ease-in-out infinite;
+                color: #329ae0;
+                display: inline-block;
+                animation: pulseText 2s ease-in-out infinite;
             }
 
             @keyframes pulseText {
-                0%, 100% {
-                    transform: scale(1);
-                }
-                50% {
-                    transform: scale(1.03); /* 살짝 확대 */
-                }
+                0%, 100% { transform: scale(1); }
+                50%      { transform: scale(1.03); }
             }
-            
-
-
-
-
-
 
             /* Footer */
             footer {
@@ -419,6 +374,9 @@
                 margin-bottom: 2rem;
                 padding-left:2rem;
                 padding-right:1rem;
+                max-width: 1200px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .footer-brand {
@@ -464,6 +422,9 @@
                 align-items: center;
                 flex-wrap: wrap;
                 gap: 1rem;
+                max-width: 1200px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .footer-bottom p {
@@ -512,7 +473,6 @@
             </div>
         </header>
 
-
         <!-- Title Section -->
         <section class="Hello" id="Hello">
             <div class="Hello-container">
@@ -530,10 +490,8 @@
                 </div>
 
                 <img class="logo-airport" src="../images/pharmacyLogo.png" alt="약국로고">
-    
             </div>
         </section>
-
 
         <!-- before simulation Section -->
         <section class="AirportSim" id="AirportSim">
@@ -580,7 +538,6 @@
                 만들고 있습니다.<br>
             </div>
         </section>
-
 
         <!-- Footer -->
         <footer id="contact">
@@ -631,24 +588,22 @@
             </div>
         </footer>
 
-
         <script>
-
-            //로고 효과
+            // 로고 효과
             document.addEventListener("DOMContentLoaded", () => {
-            const airportLogo = document.querySelector(".logo-airport");
-            if (!airportLogo) return;
+                const airportLogo = document.querySelector(".logo-airport");
+                if (!airportLogo) return;
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    airportLogo.classList.toggle("show", entry.isIntersecting);
-                });
-            }, { threshold: 0.2 });
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        airportLogo.classList.toggle("show", entry.isIntersecting);
+                    });
+                }, { threshold: 0.2 });
 
-            observer.observe(airportLogo);
+                observer.observe(airportLogo);
             });
 
-            //두번째 섹션 타이틀과 절차 효과
+            // 두번째 섹션 타이틀과 절차 효과
             document.addEventListener("DOMContentLoaded", () => {
                 const target = document.querySelector(".AirportSim .title");
                 if (!target) return;
@@ -658,7 +613,7 @@
                         if (entry.isIntersecting) {
                             target.classList.add("show");
                         } else {
-                            target.classList.remove("show"); // 스크롤 내릴 때마다 반복하려면 제거
+                            target.classList.remove("show");
                         }
                     });
                 }, { threshold: 0.4 });
@@ -667,204 +622,206 @@
             });
 
             document.addEventListener("DOMContentLoaded", () => {
-            const flow = document.querySelector(".nft-flow");
-            if (!flow) return;
+                const flow = document.querySelector(".nft-flow");
+                if (!flow) return;
 
-            const DUR = 800; // CSS transition 시간과 동일하게
-            let t1, t2, running = false;
+                const DUR = 800; // CSS transition 시간과 동일
+                let t1, t2, running = false;
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    if (running) return;           // 중복 방지
-                    running = true;
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            if (running) return; // 중복 방지
+                            running = true;
 
-                    flow.classList.remove("animate-back");
-                    flow.classList.add("animate");
+                            flow.classList.remove("animate-back");
+                            flow.classList.add("animate");
 
-                    t1 = setTimeout(() => {
-                    flow.classList.remove("animate");
-                    flow.classList.add("animate-back");
+                            t1 = setTimeout(() => {
+                                flow.classList.remove("animate");
+                                flow.classList.add("animate-back");
 
-                    t2 = setTimeout(() => {
-                        // 다음 트리거를 위해 초기화
-                        flow.classList.remove("animate-back");
-                        running = false;
-                    }, DUR);
-                    }, DUR);
+                                t2 = setTimeout(() => {
+                                    flow.classList.remove("animate-back");
+                                    running = false;
+                                }, DUR);
+                            }, DUR);
 
-                } else {
-                    // 화면에서 벗어나면 즉시 리셋 → 다시 들어올 때 또 실행
-                    clearTimeout(t1); clearTimeout(t2);
-                    flow.classList.remove("animate", "animate-back");
-                    running = false;
-                }
-                });
-            }, { threshold: 0.3 });
+                        } else {
+                            clearTimeout(t1); clearTimeout(t2);
+                            flow.classList.remove("animate", "animate-back");
+                            running = false;
+                        }
+                    });
+                }, { threshold: 0.3 });
 
-            observer.observe(flow);
+                observer.observe(flow);
             });
 
-
-
-            // --- Draggable NFC <img> (adapted from your window code) ---
+            // --- Draggable NFC <img> : 마우스 + 터치 지원 ---
             (function () {
-            const wrap = document.querySelector('.nfc');     // 컨테이너
-            const img  = wrap?.querySelector('img');         // 드래그할 이미지
-            if (!wrap || !img) return;
+                const wrap = document.querySelector('.nfc');     // 컨테이너
+                const img  = wrap?.querySelector('img');         // 드래그할 이미지
+                if (!wrap || !img) return;
 
-            // 컨테이너/이미지 위치 기준 설정
-            if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
-            img.style.position = 'absolute';
-            img.style.userSelect = 'none';
-            img.style.cursor = 'grab';
-
-            // 처음 한번 가운데 정렬
-            function centerOnce() {
-                const w = wrap.clientWidth, h = wrap.clientHeight;
-                const iw = img.clientWidth, ih = img.clientHeight;
-                if (!img.style.left) img.style.left = ((w - iw) / 2) + 'px';
-                if (!img.style.top)  img.style.top  = ((h - ih) / 2) + 'px';
-            }
-            if (img.complete) centerOnce();
-            else img.addEventListener('load', centerOnce);
-
-            let sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
-
-            const onDown = (e) => {
-                dragging = true;
-                img.style.cursor = 'grabbing';
-                sx = e.clientX; sy = e.clientY;
-                ox = parseFloat(img.style.left) || 0;
-                oy = parseFloat(img.style.top)  || 0;
-                e.preventDefault();
-            };
-
-            const onMove = (e) => {
-                if (!dragging) return;
-                const w = wrap.clientWidth, h = wrap.clientHeight;
-                const iw = img.clientWidth, ih = img.clientHeight;
-
-                let nx = ox + (e.clientX - sx);
-                let ny = oy + (e.clientY - sy);
-
-                // 컨테이너 내부로만 제한
-                nx = Math.max(0, Math.min(nx, w - iw));
-                ny = Math.max(0, Math.min(ny, h - ih));
-
-                img.style.left = nx + 'px';
-                img.style.top  = ny + 'px';
-
-                // 왼쪽 벽에 닿았을 때만 색 변경
-                const NFCworking = nx <= 0; // 필요하면 여유값: nx <= 1
-                wrap.classList.toggle('working', NFCworking);
-            };
-
-            const onUp = () => {
-                dragging = false;
+                // 컨테이너/이미지 위치 기준 설정
+                if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+                img.style.position = 'absolute';
+                img.style.userSelect = 'none';
+                img.style.touchAction = 'none';   // 터치 제스처(스크롤/줌) 억제
                 img.style.cursor = 'grab';
-            };
 
-            // 마우스 이벤트 (원본 코드 스타일 유지)
-            img.addEventListener('mousedown', onDown);
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('mouseup', onUp);
-
-            
-        })();
-        
-        (() => {
-            const flow   = document.querySelector('#AirportSim .nft-flow');
-            const sec3   = document.querySelector('#simulation');
-            const header = document.querySelector('header');
-            if (!flow || !sec3) return;
-
-            // 3섹션 다음 <section> (없으면 null)
-            const nextSection = (el) => {
-                let n = el?.nextElementSibling;
-                while (n && n.tagName !== 'SECTION') n = n.nextElementSibling;
-                return n || null;
-            };
-            const sec4 = nextSection(sec3);
-
-            // 레이아웃 점프 방지 placeholder (고정 중에만 차지)
-            const ph = document.createElement('div');
-            ph.style.height = flow.offsetHeight + 'px';
-            ph.style.display = 'none';
-            flow.after(ph);
-
-            const setTop = () => {
-                const h = header?.offsetHeight || 0;
-                flow.style.setProperty('--flowTop', h + 'px');
-            };
-
-            const show  = () => flow.classList.remove('is-hidden');
-            const hide  = () => flow.classList.add('is-hidden');
-            const fix   = () => { setTop(); flow.classList.add('is-fixed'); ph.style.height = flow.offsetHeight + 'px'; ph.style.display = 'block'; };
-            const unfix = () => { flow.classList.remove('is-fixed'); ph.style.display = 'none'; };
-
-            // 문서 좌표 계산
-            const pageTop = () => window.scrollY || window.pageYOffset || 0;
-            const pageRect = (el) => {
-                const r = el.getBoundingClientRect();
-                const y = pageTop();
-                return { top: r.top + y, bottom: r.bottom + y, height: r.height };
-            };
-
-
-
-            //AirportSim Section의 절차 부분만 다음 섹션에서 상단바로 고정
-            function update() {
-                const h = header?.offsetHeight || 0;
-                const y = pageTop();
-
-                const s3 = pageRect(sec3);
-                const s4 = sec4 ? pageRect(sec4) : null;
-
-                const enterFix = y + h >= s3.top;                         // 헤더 하단이 3섹션 상단을 지난 순간
-                const leaveFix = s4 ? (y + h >= s4.top) : (y + h >= s3.bottom); // 4섹션 진입(있으면) 또는 3섹션 끝
-
-                if (!enterFix) {
-                // 3섹션 이전: 원래 자리, 보임
-                unfix(); show();
-                } else if (enterFix && !leaveFix) {
-                // 3섹션 구간: 고정, 보임
-                fix(); show();
-                } else {
-                // 4섹션부터: 숨김 + 고정 해제
-                hide(); unfix();
+                // 처음 한번 가운데 정렬
+                function centerOnce() {
+                    const w = wrap.clientWidth, h = wrap.clientHeight;
+                    const iw = img.clientWidth, ih = img.clientHeight;
+                    if (!img.style.left) img.style.left = ((w - iw) / 2) + 'px';
+                    if (!img.style.top)  img.style.top  = ((h - ih) / 2) + 'px';
                 }
-            }
+                if (img.complete) centerOnce();
+                else img.addEventListener('load', centerOnce);
 
-            // 초기/스크롤/리사이즈에서 상태 업데이트
-            setTop();
-            update();
-            window.addEventListener('scroll',  update, { passive: true });
-            window.addEventListener('resize', () => { setTop(); update(); });
+                let sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
+
+                function getClientXY(e) {
+                    if (e.touches && e.touches.length) {
+                        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    }
+                    if (e.changedTouches && e.changedTouches.length) {
+                        return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+                    }
+                    return { x: e.clientX, y: e.clientY };
+                }
+
+                const onDown = (e) => {
+                    const { x, y } = getClientXY(e);
+                    dragging = true;
+                    img.style.cursor = 'grabbing';
+                    sx = x; sy = y;
+                    ox = parseFloat(img.style.left) || 0;
+                    oy = parseFloat(img.style.top)  || 0;
+                    if (e.cancelable) e.preventDefault(); // 터치 스크롤/더블탭 확대 방지
+                };
+
+                const onMove = (e) => {
+                    if (!dragging) return;
+                    const { x, y } = getClientXY(e);
+
+                    const w = wrap.clientWidth, h = wrap.clientHeight;
+                    const iw = img.clientWidth, ih = img.clientHeight;
+
+                    let nx = ox + (x - sx);
+                    let ny = oy + (y - sy);
+
+                    // 컨테이너 내부로만 제한
+                    nx = Math.max(0, Math.min(nx, w - iw));
+                    ny = Math.max(0, Math.min(ny, h - ih));
+
+                    img.style.left = nx + 'px';
+                    img.style.top  = ny + 'px';
+
+                    // 왼쪽 벽에 닿았을 때만 색 변경
+                    const NFCworking = nx <= 0;
+                    wrap.classList.toggle('working', NFCworking);
+
+                    if (e.cancelable) e.preventDefault(); // 터치 스크롤 방지
+                };
+
+                const onUp = (e) => {
+                    if (!dragging) return;
+                    dragging = false;
+                    img.style.cursor = 'grab';
+                    if (e && e.cancelable) e.preventDefault();
+                };
+
+                // 마우스 이벤트
+                img.addEventListener('mousedown', onDown);
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+
+                // 터치 이벤트 (passive: false로 스크롤 방지)
+                img.addEventListener('touchstart', onDown, { passive: false });
+                window.addEventListener('touchmove', onMove, { passive: false });
+                window.addEventListener('touchend', onUp, { passive: false });
+                window.addEventListener('touchcancel', onUp, { passive: false });
+            })();
+        
+            (() => {
+                const flow   = document.querySelector('#AirportSim .nft-flow');
+                const sec3   = document.querySelector('#simulation');
+                const header = document.querySelector('header');
+                if (!flow || !sec3) return;
+
+                // 3섹션 다음 <section> (없으면 null)
+                const nextSection = (el) => {
+                    let n = el?.nextElementSibling;
+                    while (n && n.tagName !== 'SECTION') n = n.nextElementSibling;
+                    return n || null;
+                };
+                const sec4 = nextSection(sec3);
+
+                // 레이아웃 점프 방지 placeholder (고정 중에만 차지)
+                const ph = document.createElement('div');
+                ph.style.height = flow.offsetHeight + 'px';
+                ph.style.display = 'none';
+                flow.after(ph);
+
+                const setTop = () => {
+                    const h = header?.offsetHeight || 0;
+                    flow.style.setProperty('--flowTop', h + 'px');
+                };
+
+                const show  = () => flow.classList.remove('is-hidden');
+                const hide  = () => flow.classList.add('is-hidden');
+                const fix   = () => { setTop(); flow.classList.add('is-fixed'); ph.style.height = flow.offsetHeight + 'px'; ph.style.display = 'block'; };
+                const unfix = () => { flow.classList.remove('is-fixed'); ph.style.display = 'none'; };
+
+                const pageTop = () => window.scrollY || window.pageYOffset || 0;
+                const pageRect = (el) => {
+                    const r = el.getBoundingClientRect();
+                    const y = pageTop();
+                    return { top: r.top + y, bottom: r.bottom + y, height: r.height };
+                };
+
+                // AirportSim Section의 절차 부분만 다음 섹션에서 상단바로 고정
+                function update() {
+                    const h = header?.offsetHeight || 0;
+                    const y = pageTop();
+
+                    const s3 = pageRect(sec3);
+                    const s4 = sec4 ? pageRect(sec4) : null;
+
+                    const enterFix = y + h >= s3.top;
+                    const leaveFix = s4 ? (y + h >= s4.top) : (y + h >= s3.bottom);
+
+                    if (!enterFix) {
+                        unfix(); show();
+                    } else if (enterFix && !leaveFix) {
+                        fix(); show();
+                    } else {
+                        hide(); unfix();
+                    }
+                }
+
+                setTop();
+                update();
+                window.addEventListener('scroll',  update, { passive: true });
+                window.addEventListener('resize', () => { setTop(); update(); });
             })();
 
-
-            //라스트 멘트 효과
-           document.addEventListener("DOMContentLoaded", () => {
+            // 라스트 멘트 효과
+            document.addEventListener("DOMContentLoaded", () => {
                 const title = document.querySelector(".lastment .title");
                 if (!title) return;
 
                 const ioLastment = new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
-                    title.classList.toggle("show", entry.isIntersecting);
+                        title.classList.toggle("show", entry.isIntersecting);
                     });
                 }, { threshold: 0.8 });
 
                 ioLastment.observe(title);
             });
-       
-
-
-
         </script>
-
-        
-
-
     </body>
 </html>
