@@ -652,6 +652,32 @@
             background: rgba(255, 255, 255, 0.3);
             border-radius: 2px;
         }
+
+        /* --- 모바일(터치 기기)에서 섹션 세로 과도 확장 방지 --- */
+        @media (hover: none) and (pointer: coarse) {
+          .hero {
+            min-height: auto !important;     /* 90vh 제거 */
+            padding: 100px 0 60px;           /* 기존 느낌 유지 */
+          }
+          .screen-showing .container_left,
+          .screen-showing .container_right {
+            min-height: auto !important;     /* 100vh 제거 */
+            padding: 60px 2rem;              /* 여백만 유지 */
+          }
+        }
+        
+        /* dvh 지원 브라우저에서 부드럽게 상한을 둠(데스크톱 영향X) */
+        @supports (height: 100dvh) {
+          .hero {
+            /* fallback(위) 유지 + dvh로 상한 캡 */
+            min-height: clamp(560px, 80dvh, 760px);
+          }
+          .screen-showing .container_left,
+          .screen-showing .container_right {
+            min-height: clamp(520px, 80dvh, 740px);
+          }
+        }
+
     </style>
 </head>
 <body>
