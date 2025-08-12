@@ -678,6 +678,32 @@
           }
         }
 
+/* ===== 모바일에서 '본문이 들썩이는' 현상 완전 정지 ===== */
+@media (hover: none) and (pointer: coarse) {
+  /* 레이아웃 흔들 수 있는 애니메이션/트랜지션 OFF */
+  .logo_respon,
+  .Simulation .title,
+  .phone-screen,
+  .phone-screen img {
+    animation: none !important;
+  }
+  /* 헤더 블러/트랜지션도 OFF (모바일 사파리에서 특히 떨림 유발) */
+  header {
+    transition: none !important;
+    backdrop-filter: none !important;
+    background: rgba(255,255,255,0.98) !important;
+  }
+  /* vh 기반 높이 제거하고 고정값 적용 */
+  .hero {
+    min-height: 680px !important;
+    padding: 100px 0 60px !important;
+  }
+  .screen-showing .container_left,
+  .screen-showing .container_right {
+    min-height: 680px !important;
+    padding: 60px 2rem !important;
+  }
+
     </style>
 </head>
 <body>
