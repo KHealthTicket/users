@@ -313,7 +313,7 @@
         }
         
         .selection-buttons {
-            display: flex; gap: 40px; justify-content: center; margin-bottom: 40px;
+            display: flex; gap: 40px; justify-content: center; margin-bottom: 40px; flex-wrap: nowrap; 
         }
         
         .method-btn {
@@ -325,11 +325,19 @@
             transition: all 0.3s ease;
             width: 200px;
             text-align: center;
+
+           
+            flex: 0 0 200px;     /* 고정 폭 */
         }
         
         .method-btn:hover {
             background: #3498db; color: white; transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        @media (max-width: 768px) {
+        .selection-buttons { flex-direction: row !important; }
+        .method-btn { width: 200px !important; flex: 0 0 200px !important; }
         }
         
         .method-icon { font-size: 60px; margin-bottom: 20px; }
@@ -393,7 +401,18 @@
         .medication-quantity { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; min-width: 80px; text-align: center; }
         
         /* 버튼들 */
-        .action-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: nowrap; 
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons { flex-direction: row !important; flex-wrap: nowrap !important; }
+            .action-buttons .btn { width: auto !important; }
+        }
         
         .btn { padding: 15px 30px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
         
