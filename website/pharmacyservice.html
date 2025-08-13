@@ -104,62 +104,38 @@
                 color: #4A90E2;
                 background: rgba(74, 144, 226, 0.1);
             }
+           
 
             /* Hello section */
+            :root{
+            --hello-w: 1200px;
+            --hello-h: 675px; 
+            }
+
             .Hello{
-                background: linear-gradient(135deg, #016bb2 0%, #78c4f7 100%);
-                padding: 120px 0 80px;
-                min-height: 80vh;
-                display: flex;
-                align-items: center;
-            }
-            .Hello-container {
-                max-width: 1000px;
-                margin-left: 10rem;      
-                margin-right: auto;   
-                padding: 0 2rem;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 4rem;
-                align-items: center;
-            }
-            .Hello-content h1 {
-                font-size: 3.2rem;
-                font-weight: 700;
-                line-height: 1.2;
-                margin-bottom: 1.5rem;
-                color: #ffffff;
-
-                opacity: 0;                  
-                transform: translateY(30px); 
-                animation: fadeUp 2s ease-out forwards;
-                animation-delay: 0.3s;       
-            }
-            @keyframes fadeUp {
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .Hello-content .subtitle{
-                text-align: left;
-                font-size: 0.8rem;
-                color: #e2ecf5c8;
-                margin-top: 2rem;
-                margin-bottom: 3rem;
-                max-width: 600px;
-                margin-left: auto;
-                margin-right: auto;
+            padding: 0;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #016bb2 0%, #78c4f7 100%);
             }
 
-            .logo-airport {
-                max-width: 80%;
-                height: auto;
-                display: block;
-                margin: 0 0rem;
-                opacity: 0;
-                transition: opacity 0.8s ease;
+            .Hello-container{
+            width: var(--hello-w);
+            height: var(--hello-h);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;  /* 데스크톱 2열 유지 */
+            align-items: center;
+            gap: 32px;
+            padding: 32px;
+            overflow: hidden; /* 안전 */
             }
+
+            /* 글자/이미지 크기는 원하는 고정값 그대로 */
+            .Hello-content h1{ font-size: 3.2rem; line-height: 1.2; color:#fff; margin:0; }
+            .Hello-content .subtitle{ font-size: .95rem; color:#e6ecff; margin-top: 1rem; }
+            .logo-airport{ max-width: 420px; height: auto; display:block; }
+
 
             .logo-airport.show {
                 animation: fadePulse 2.5s ease-in-out infinite;
